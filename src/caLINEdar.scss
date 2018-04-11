@@ -1,7 +1,7 @@
-$caLINEdar-font-color: #333;
+$caLINEdar-font-color: #3a3a3a;
 $caLINEdar-panel-height: 2em;
-$caLINEdar-table-height: 15.75em;
-$caLINEdar-height: $caLINEdar-panel-height + $caLINEdar-table-height + 0.5em;
+$caLINEdar-table-max-height: 15.75em;
+$caLINEdar-height: $caLINEdar-panel-height + $caLINEdar-table-max-height + 0.5em;
 
 .caLINEdar-input {
   width: 100%;
@@ -23,7 +23,8 @@ $caLINEdar-height: $caLINEdar-panel-height + $caLINEdar-table-height + 0.5em;
 }
 
 .caLINEdar {
-  width: 18.75em; /* 300px = 18.75em @ 1em is 16px */
+  // 300px = 18.75em @ 1em is 16px
+  width: 18.75em;
   height: $caLINEdar-height;
   padding: 4px;
   border: 1px solid #ccc;
@@ -130,9 +131,10 @@ $caLINEdar-after-elm-btm: $caLINEdar-after-elm-top;
   background: #efefef;
 }
 
-.caLINEdar-date-picker.caLINEdar-table {
+.caLINEdar-table {
   width: 100%;
-  height: $caLINEdar-table-height;
+  height: $caLINEdar-table-max-height;
+  margin: 0 auto;
   color: $caLINEdar-font-color;
   vertical-align: middle;
   text-align: center;
@@ -168,5 +170,11 @@ $caLINEdar-after-elm-btm: $caLINEdar-after-elm-top;
   border: 1px solid transparent;
   background: unset;
   cursor: default;
+}
+
+.caLINEdar-month-picker > .caLINEdar-table {
+  width: 80%;
+  height: $caLINEdar-table-max-height - 2em;
+  margin-top: 1em;
 }
 
