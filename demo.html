@@ -14,84 +14,11 @@
   </style>
 
   <style>
-    .caLINEdar-input {
-      width: 100%;
-      height: 2.8em;
-      padding: 0.2em 1em;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
-      box-sizing: border-box;
-      color: #595959;
-      vertical-align: middle;
-      background: #fff;
-    }
-
-    .caLINEdar-input:focus {
-      border-color: #66ade8;
-      box-shadow: inset 0 1px 1px rgba(0,0,0,0.075), 0 0 6px rgba(102, 173, 232, 0.6);
-      outline: 0;
-    }
-
-    .caLINEdar-picker {
-      width: 300px;
-      padding: 4px;
-      border: 1px solid #ccc;
-      border-radius: 3px;
-      box-sizing: border-box;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
-      background: #fff;
-      position: absolute;
-      z-index: 999;
-
-
-      height: 320px;
-    }
-
-    .caLINEdar-picker::before {
-      content: '';
-      display: block;
-      border-top: 0;
-      border-left: 7px solid transparent;
-      border-right: 7px solid transparent;
-      border-bottom: 7px solid #bbb;
-      position: absolute;
-      top: -7px;
-      left: 9px;
-    }
-
-    .caLINEdar-picker::after {
-      content: '';
-      display: block;
-      border-top: 0;
-      border-left: 6px solid transparent;
-      border-right: 6px solid transparent;
-      border-bottom: 6px solid #fff;
-      position: absolute;
-      top: -6px;
-      left: 10px;
-    }
-
-    .caLINEdar-picker.caLINEdar-picker--on-top::before {
-      border-top: 7px solid #bbb;
-      border-bottom: 0;
-      top: unset;
-      bottom: -7px;
-    }
-
-    .caLINEdar-picker.caLINEdar-picker--on-top::after {
-      border-top: 6px solid #fff;
-      border-bottom: 0;
-      top: unset;
-      bottom: -6px;
-    }
   </style>
 
 </head>
 
 <body>
-
-  
 
   <div class="calendar-container">
 
@@ -99,11 +26,85 @@
 
   </div>
 
-  <div class="caLINEdar-picker caLINEdar-picker--on-top">
-    
+  <div class="caLINEdar caLINEdar--on-top">
+    <div class="caLINEdar-date-picker">
+      <div class="caLINEdar-panel">
+        <div class="caLINEdar-panel__btn left-btn"></div>
+        <div class="caLINEdar-subpanel">
+          <div class="caLINEdar-panel__btn picker-btn">Apr</div>
+          <div class="caLINEdar-panel__btn picker-btn">2018</div>
+        </div>
+        <div class="caLINEdar-panel__btn right-btn"></div>
+      </div>
+      <table class="caLINEdar-date-picker caLINEdar-table">
+        <tr class="caLINEdar-table-header">
+          <th class="caLINEdar-table-cell">Su</th>
+          <th class="caLINEdar-table-cell">Mo</th>
+          <th class="caLINEdar-table-cell">Tu</th>
+          <th class="caLINEdar-table-cell">We</th>
+          <th class="caLINEdar-table-cell">Th</th>
+          <th class="caLINEdar-table-cell">Fr</th>
+          <th class="caLINEdar-table-cell">Sa</th>
+        </tr>
+        <tr>
+          <td class="caLINEdar-table-cell picked">1</td>
+          <td class="caLINEdar-table-cell">2</td>
+          <td class="caLINEdar-table-cell">3</td>
+          <td class="caLINEdar-table-cell">4</td>
+          <td class="caLINEdar-table-cell">5</td>
+          <td class="caLINEdar-table-cell">6</td>
+          <td class="caLINEdar-table-cell">7</td>
+        <tr>
+        <tr>
+          <td class="caLINEdar-table-cell">1</td>
+          <td class="caLINEdar-table-cell">2</td>
+          <td class="caLINEdar-table-cell">3</td>
+          <td class="caLINEdar-table-cell">4</td>
+          <td class="caLINEdar-table-cell">5</td>
+          <td class="caLINEdar-table-cell">6</td>
+          <td class="caLINEdar-table-cell">7</td>
+        <tr>
+        <tr>
+          <td class="caLINEdar-table-cell">1</td>
+          <td class="caLINEdar-table-cell">2</td>
+          <td class="caLINEdar-table-cell">3</td>
+          <td class="caLINEdar-table-cell">4</td>
+          <td class="caLINEdar-table-cell">5</td>
+          <td class="caLINEdar-table-cell">6</td>
+          <td class="caLINEdar-table-cell">7</td>
+        <tr>
+        <tr>
+          <td class="caLINEdar-table-cell">1</td>
+          <td class="caLINEdar-table-cell">2</td>
+          <td class="caLINEdar-table-cell">3</td>
+          <td class="caLINEdar-table-cell">4</td>
+          <td class="caLINEdar-table-cell">5</td>
+          <td class="caLINEdar-table-cell">6</td>
+          <td class="caLINEdar-table-cell">7</td>
+        <tr>
+        <tr>
+          <td class="caLINEdar-table-cell">1</td>
+          <td class="caLINEdar-table-cell">2</td>
+          <td class="caLINEdar-table-cell">3</td>
+          <td class="caLINEdar-table-cell">4</td>
+          <td class="caLINEdar-table-cell">5</td>
+          <td class="caLINEdar-table-cell">6</td>
+          <td class="caLINEdar-table-cell">7</td>
+        <tr>
+        <tr>
+          <td class="caLINEdar-table-cell">1</td>
+          <td class="caLINEdar-table-cell">2</td>
+          <td class="caLINEdar-table-cell">3</td>
+          <td class="caLINEdar-table-cell">4</td>
+          <td class="caLINEdar-table-cell">5</td>
+          <td class="caLINEdar-table-cell">6</td>
+          <td class="caLINEdar-table-cell">7</td>
+        <tr>
+      </table>
+    </div>
   </div>
 
-  <script type="text/javascript" src="./dist/caLINEdar.bundle.js"></script>
+  <script type="text/javascript" src="./dist/caLINEdar.dev.bundle.js"></script>
 </body> 
 
 </html>
