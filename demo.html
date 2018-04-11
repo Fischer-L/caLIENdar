@@ -5,9 +5,48 @@
   <title>caLINEdar demo</title>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    .calendar-container {
+      width: 200px;
+      margin: 30px auto;
+    }
+  </style>
+
+  <style>
+    .caLINEdar-input {
+      width: 100%;
+      height: 2.8em;
+      padding: 0.2em 1em;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+      box-sizing: border-box;
+      color: #595959;
+      vertical-align: middle;
+      background-color: #fff;
+    }
+
+    .caLINEdar-input:focus {
+      border-color: #66ade8;
+      box-shadow: inset 0 1px 1px rgba(0,0,0,0.075), 0 0 6px rgba(102, 173, 232, 0.6);
+      outline: 0;
+    }
+  </style>
+
 </head>
 
 <body>
+
+  
+
+  <div class="calendar-container">
+
+    <input type="text" class="caLINEdar-input" />
+
+  </div>
+
+
   <script type="text/javascript" src="./dist/caLINEdar.bundle.js"></script>
 </body> 
 
