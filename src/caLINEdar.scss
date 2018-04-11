@@ -172,6 +172,7 @@ $caLINEdar-after-elm-btm: $caLINEdar-after-elm-top;
   cursor: default;
 }
 
+.caLINEdar-year-picker > .caLINEdar-table,
 .caLINEdar-month-picker > .caLINEdar-table {
   width: 80%;
   height: $caLINEdar-table-max-height - 2em;
