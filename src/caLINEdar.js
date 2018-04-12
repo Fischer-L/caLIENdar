@@ -184,24 +184,6 @@ const caLINEdar = {
     return picker;
   },
 
-  _createYearPicker(years) {
-    let picker = this._createEmptyPicker({
-      pickerBtnCount: 1,
-      headerCount: 0,
-      cellCount: 3,
-      rowCount: 3,
-    });
-    picker.classList.add("caLINEdar-year-picker");
-
-    let btn = picker.querySelector(".caLINEdar-panel__btn.picker-btn");
-    btn.textContent = years.find(y => y.picked).text;
-
-    let table = picker.querySelector(".caLINEdar-table");
-    this._updateTableCells(table, years);
-
-    return picker;
-  },
-
   _openCalendarHolder() {
     if (!this._calendar) {
       this._calendar = this._doc.createElement("div");
@@ -269,6 +251,8 @@ const caLINEdar = {
   async openCalendar(anchorInput, pickerBtns, weekHeaders, dates) {
     this._openCalendarHolder();
     await this.openDatePicker(pickerBtns, weekHeaders, dates);
+    // Let's always position the calendar after making our picker visible
+    // so as to make sure the right dimension is populated when positioning. 
     await this.positionCalendar(this._win, anchorInput);
   },
 
@@ -277,6 +261,7 @@ const caLINEdar = {
       throw new Error("Should open the calendar once first then open the data picker");
     }
     if (!this._datePicker) {
+      // Yes we do the lazy creation for all the date, month, year pickers.
       this._datePicker = this._createEmptyPicker({
         pickerBtnCount: 2,
         headerCount: 7,
@@ -286,6 +271,7 @@ const caLINEdar = {
       this._datePicker.classList.add("caLINEdar-date-picker");
       this._calendar.appendChild(this._datePicker);
     }
+    this.closeYearPicker();
     this.closeMonthPicker();
     this._datePicker.style.display = "";
     return this.updateDatePicker(pickerBtns, weekHeaders, dates);
@@ -336,6 +322,7 @@ const caLINEdar = {
       this._calendar.appendChild(this._monthPicker);
     }
     this.closeDatePicker();
+    this.closeYearPicker();
     this._monthPicker.style.display = "";
     return this.updateMonthPicker(months);
   },
@@ -357,6 +344,46 @@ const caLINEdar = {
         let table = picker.querySelector(".caLINEdar-table");
         this._updateTableCells(table, months);
         resolve();
+      });
+    });
+  },
+
+  opneYearPicker(years) {
+    if (!this._calendar) {
+      throw new Error("Should open the calendar once first then open the year picker");
+    }
+    if (!this._yearPicker) {
+      this._yearPicker = this._createEmptyPicker({
+        pickerBtnCount: 1,
+        headerCount: 0,
+        cellCount: 3,
+        rowCount: 3,
+      });
+      this._yearPicker.classList.add("caLINEdar-year-picker");
+      this._calendar.appendChild(this._yearPicker);
+    }
+    this.closeDatePicker();
+    this.closeMonthPicker();
+    this._yearPicker.style.display = "";
+    return this.updateYearPicker(years);
+  },
+
+  closeYearPicker() {
+    if (this._yearPicker) {
+      this._yearPicker.style.display = "none";
+    }
+  },
+
+  updateYearPicker(years) {
+    return new Promise(resolve => {
+      this._win.requestAnimationFrame(() => {
+        let picker = this._yearPicker;
+
+        let btn = picker.querySelector(".caLINEdar-panel__btn.picker-btn");
+        btn.textContent = years.find(y => y.picked).text;
+
+        let table = picker.querySelector(".caLINEdar-table");
+        this._updateTableCells(table, years);
       });
     });
   },

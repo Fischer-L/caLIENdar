@@ -1,16 +1,13 @@
 import caLINEdar from "../src/caLINEdar";
 
-function createFakeYearPicker() {
-  let calendar = caLINEdar._createCalendar();
+function getFakeYearArgs() {
   let yrs = 
     [2014, 2015, 2016, 2017, 2018, 2019,  2020, 2021, 2022 ].map(y => ({
       value: y,
       text: y,
       picked: y === 2018
     }));
-  let yrPicker = caLINEdar._createYearPicker(yrs);
-  calendar.appendChild(yrPicker);
-  document.body.appendChild(calendar);
+  return yrs;
 }
 
 function getFakeMonthArgs() {
@@ -67,3 +64,6 @@ caLINEdar.openCalendar(anchorInput, pickerBtns, weekHeaders, dates);
 
 let months = getFakeMonthArgs();
 caLINEdar.openMonthPicker(months);
+
+let yrs = getFakeYearArgs();
+caLINEdar.opneYearPicker(yrs);
