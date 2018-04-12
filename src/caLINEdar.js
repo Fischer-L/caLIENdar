@@ -113,29 +113,14 @@ const caLINEdar = {
     return tr;
   },
 
-  _createYearPicker(yrs, currentYrsIdx) {
-    if (yrs.length === 0 || !yrs[currentYrsIdx]) {
-      return null;
-    }
-
-    let picker = this._doc.createElement("div");
-    picker.classList.add("caLINEdar-year-picker");
-
-    let panel = this._createPanel();
-    let btns = panel.querySelectorAll(".caLINEdar-panel__btn.picker-btn");
-    btns[0].textContent = yrs[currentYrsIdx];
-    btns[1].remove();
-    picker.appendChild(panel);
-
-    let table = this._createTable({ headerCount: 0 });
-    for (let i = 0; i < yrs.length;) {
-      let cellCount = 3;
+  _insertCells(table, cellCount, pickedIdx, data) {
+    for (let i = 0; i < data.length;) {
       let row = this._createTableRow({ cellCount });
       let cells = row.querySelectorAll(".caLINEdar-table-cell");
       for (let j = 0; j < cellCount; ++j, ++i) {
-        if (yrs[i]) {
-          cells[j].textContent = yrs[i];
-          if (i === currentYrsIdx) {
+        if (data[i]) {
+          cells[j].textContent = data[i];
+          if (i === pickedIdx) {
             cells[j].classList.add("picked");
           }
         } else {
@@ -144,6 +129,44 @@ const caLINEdar = {
       }
       table.appendChild(row);
     }
+  },
+
+  _createYearPicker(pickedYrsIdx, yrs) {
+    if (yrs.length === 0 || !yrs[pickedYrsIdx]) {
+      return null;
+    }
+
+    let picker = this._doc.createElement("div");
+    picker.classList.add("caLINEdar-year-picker");
+
+    let panel = this._createPanel();
+    let btns = panel.querySelectorAll(".caLINEdar-panel__btn.picker-btn");
+    btns[0].textContent = yrs[pickedYrsIdx];
+    btns[1].remove();
+    picker.appendChild(panel);
+
+    let table = this._createTable({ headerCount: 0 });
+    this._insertCells(table, 3, pickedYrsIdx, yrs);
+    picker.appendChild(table);
+    return picker;
+  },
+
+  _createMonthPicker(pickedMonthIdx, months) {
+    if (months.length === 0 || !months[pickedMonthIdx]) {
+      return null;
+    }
+
+    let picker = this._doc.createElement("div");
+    picker.classList.add("caLINEdar-year-picker");
+
+    let panel = this._createPanel();
+    let btns = panel.querySelectorAll(".caLINEdar-panel__btn.picker-btn");
+    btns[0].textContent = months[pickedMonthIdx];
+    btns[1].remove();
+    picker.appendChild(panel);
+
+    let table = this._createTable({ headerCount: 0 });
+    this._insertCells(table, 4, pickedMonthIdx, months);
     picker.appendChild(table);
     return picker;
   },
