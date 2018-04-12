@@ -146,9 +146,10 @@ $caLINEdar-after-elm-btm: $caLINEdar-after-elm-top;
   padding: 0;
   border: 1px solid transparent;
   border-radius: 3px;
-  cursor: pointer;
   box-sizing: border-box;
+  color: #777;
 }
+
 .caLINEdar-table-cell.picked {
   background: #95badb;
 }
@@ -157,11 +158,12 @@ $caLINEdar-after-elm-btm: $caLINEdar-after-elm-top;
   color: #e83752;
 }
 
-.caLINEdar-table-cell.inactive {
-  color: #777;
+.caLINEdar-table-cell.active {
+  color: unset;
+  cursor: pointer;
 }
 
-.caLINEdar-table-cell:hover {
+.caLINEdar-table-cell.active:hover {
   border: 1px solid #efefef;
   background: #efefef;
 }

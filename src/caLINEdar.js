@@ -60,7 +60,7 @@ const caLINEdar = {
    *     <th class="caLINEdar-table-cell">Fr</th>
    *     <th class="caLINEdar-table-cell">Sa</th>
    *   </tr>
-   *   <tr>
+   *   <tr class="caLINEdar-table-values">
    *     <td class="caLINEdar-table-cell picked">1</td>
    *     <td class="caLINEdar-table-cell">2</td>
    *     <td class="caLINEdar-table-cell">3</td>
@@ -113,61 +113,100 @@ const caLINEdar = {
     return tr;
   },
 
-  _insertCells(table, cellCount, pickedIdx, data) {
-    for (let i = 0; i < data.length;) {
-      let row = this._createTableRow({ cellCount });
-      let cells = row.querySelectorAll(".caLINEdar-table-cell");
+  _updateTableCells(table, pickedIdx, values) {
+    let rows = table.querySelectorAll(".caLINEdar-table-values");
+    let cellCount = rows[0].querySelectorAll(".caLINEdar-table-cell").length;
+
+    let valuesByRows = [];
+    for (let i = 0; i < values.length;) {
+      let data = [];
       for (let j = 0; j < cellCount; ++j, ++i) {
-        if (data[i]) {
-          cells[j].textContent = data[i];
-          if (i === pickedIdx) {
+        data.push(values[i] || null);
+      }
+      valuesByRows.push(data);
+    }
+
+    for (let i = 0; i < rows.length; ++i) {
+      let row = rows[i];
+      let data = valuesByRows[i] || null;
+      let cells = row.querySelectorAll(".caLINEdar-table-cell");
+      for (let j = 0; j < cellCount; ++j) {
+        if (data && data[j]) {
+          if (i * cellCount + j === pickedIdx) {
             cells[j].classList.add("picked");
           }
+          cells[j].textContent = data[j]; 
+          cells[j].classList.add("active");
         } else {
-          cells[j].remove();
+          cells[j].classList.remove("active");
         }
       }
-      table.appendChild(row);
     }
   },
 
-  _createYearPicker(pickedYrsIdx, yrs) {
-    if (yrs.length === 0 || !yrs[pickedYrsIdx]) {
+  _createEmptyPicker(options = {}) {
+    let rowCount = options.rowCount || 0;
+    let cellCount = options.cellCount || 0;
+    let headerCount = options.headerCount || 0;
+    let pickerBtnCount = options.pickerBtnCount || 0;
+    if (cellCount <= 0 || rowCount <= 0 || 
+        headerCount < 0 || pickerBtnCount < 0) {
       return null;
     }
 
     let picker = this._doc.createElement("div");
-    picker.classList.add("caLINEdar-year-picker");
 
     let panel = this._createPanel();
     let btns = panel.querySelectorAll(".caLINEdar-panel__btn.picker-btn");
-    btns[0].textContent = yrs[pickedYrsIdx];
-    btns[1].remove();
+    for (let i = btns.length - 1; i >= pickerBtnCount; --i) {
+      btns[i].style.display = "none"; 
+    }
     picker.appendChild(panel);
 
-    let table = this._createTable({ headerCount: 0 });
-    this._insertCells(table, 3, pickedYrsIdx, yrs);
+    let table = this._createTable({ headerCount });
+    for (let i = 0; i < rowCount; ++i) {
+      let row = this._createTableRow({ cellCount });
+      row.classList.add("caLINEdar-table-values");
+      table.appendChild(row);
+    }
     picker.appendChild(table);
+
+    return picker;
+  },
+
+  _createYearPicker(pickedYrsIdx, yrs) {
+    let picker = this._createEmptyPicker({
+      headerCount: 0,
+      pickerBtnCount: 1,
+      cellCount: 3,
+      rowCount: 3,
+    });
+    picker.classList.add("caLINEdar-year-picker");
+
+    let btn = picker.querySelector(".caLINEdar-panel__btn.picker-btn");
+    btn.textContent = yrs[pickedYrsIdx];
+
+    let table = picker.querySelector(".caLINEdar-table");
+    this._updateTableCells(table, pickedYrsIdx, yrs);
+
     return picker;
   },
 
   _createMonthPicker(pickedMonthIdx, months) {
-    if (months.length === 0 || !months[pickedMonthIdx]) {
-      return null;
-    }
-
-    let picker = this._doc.createElement("div");
+    let picker = this._createEmptyPicker({
+      headerCount: 0,
+      pickerBtnCount: 1,
+      cellCount: 4,
+      rowCount: 3,
+    });
     picker.classList.add("caLINEdar-year-picker");
 
-    let panel = this._createPanel();
-    let btns = panel.querySelectorAll(".caLINEdar-panel__btn.picker-btn");
-    btns[0].textContent = months[pickedMonthIdx];
-    btns[1].remove();
-    picker.appendChild(panel);
+    let btn = picker.querySelector(".caLINEdar-panel__btn.picker-btn");
+    btn.textContent = months[pickedMonthIdx];
 
-    let table = this._createTable({ headerCount: 0 });
-    this._insertCells(table, 4, pickedMonthIdx, months);
-    picker.appendChild(table);
+    let table = picker.querySelector(".caLINEdar-table");
+    this._updateTableCells(table, pickedMonthIdx, months);
+
     return picker;
   },
 
