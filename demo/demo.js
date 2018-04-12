@@ -13,8 +13,7 @@ function createFakeYearPicker() {
   document.body.appendChild(calendar);
 }
 
-function createFakeMonthPicker() {
-  let calendar = caLINEdar._createCalendar();
+function getFakeMonthArgs() {
   let months = 
     [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Otc", "Nov", "Dec" ]
       .map((text, value) => ({ 
@@ -22,9 +21,7 @@ function createFakeMonthPicker() {
         value,
         picked: text === "Apr"
       }));
-  let monthPicker = caLINEdar._createMonthPicker(months);
-  calendar.appendChild(monthPicker);
-  document.body.appendChild(calendar);
+  return months;
 }
 
 function getFakeDatePickerArgs() {
@@ -67,3 +64,6 @@ let container = document.querySelector(".date-input-container");
 let anchorInput = caLINEdar._createInput();
 container.appendChild(anchorInput);
 caLINEdar.openCalendar(anchorInput, pickerBtns, weekHeaders, dates);
+
+let months = getFakeMonthArgs();
+caLINEdar.openMonthPicker(months);

@@ -202,24 +202,6 @@ const caLINEdar = {
     return picker;
   },
 
-  _createMonthPicker(months) {
-    let picker = this._createEmptyPicker({
-      pickerBtnCount: 1,
-      headerCount: 0,
-      cellCount: 4,
-      rowCount: 3,
-    });
-    picker.classList.add("caLINEdar-month-picker");
-
-    let btn = picker.querySelector(".caLINEdar-panel__btn.picker-btn");
-    btn.textContent = months.find(m => m.picked).text;
-
-    let table = picker.querySelector(".caLINEdar-table");
-    this._updateTableCells(table, months);
-
-    return picker;
-  },
-
   _openCalendarHolder() {
     if (!this._calendar) {
       this._calendar = this._doc.createElement("div");
@@ -304,6 +286,7 @@ const caLINEdar = {
       this._datePicker.classList.add("caLINEdar-date-picker");
       this._calendar.appendChild(this._datePicker);
     }
+    this.closeMonthPicker();
     this._datePicker.style.display = "";
     return this.updateDatePicker(pickerBtns, weekHeaders, dates);
   },
@@ -333,6 +316,46 @@ const caLINEdar = {
         }
 
         this._updateTableCells(table, dates);
+        resolve();
+      });
+    });
+  },
+
+  openMonthPicker(months) {
+    if (!this._calendar) {
+      throw new Error("Should open the calendar once first then open the month picker");
+    }
+    if (!this._monthPicker) {
+      this._monthPicker = this._createEmptyPicker({
+        pickerBtnCount: 1,
+        headerCount: 0,
+        cellCount: 4,
+        rowCount: 3,
+      });
+      this._monthPicker.classList.add("caLINEdar-month-picker");
+      this._calendar.appendChild(this._monthPicker);
+    }
+    this.closeDatePicker();
+    this._monthPicker.style.display = "";
+    return this.updateMonthPicker(months);
+  },
+
+  closeMonthPicker() {
+    if (this._monthPicker) {
+      this._monthPicker.style.display = "none";
+    }
+  },
+
+  updateMonthPicker(months) {
+    return new Promise(resolve => {
+      this._win.requestAnimationFrame(() => {
+        let picker = this._monthPicker;
+
+        let btn = picker.querySelector(".caLINEdar-panel__btn.picker-btn");
+        btn.textContent = months.find(m => m.picked).text;
+
+        let table = picker.querySelector(".caLINEdar-table");
+        this._updateTableCells(table, months);
         resolve();
       });
     });
