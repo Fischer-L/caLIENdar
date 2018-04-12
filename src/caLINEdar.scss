@@ -147,7 +147,6 @@ $caLINEdar-after-elm-btm: $caLINEdar-after-elm-top;
   border: 1px solid transparent;
   border-radius: 3px;
   box-sizing: border-box;
-  color: #777;
 }
 
 .caLINEdar-table-cell.picked {
@@ -158,20 +157,17 @@ $caLINEdar-after-elm-btm: $caLINEdar-after-elm-top;
   color: #e83752;
 }
 
+.caLINEdar-table-cell.gray-out-date {
+  color: #777;
+}
+
 .caLINEdar-table-cell.active {
-  color: unset;
   cursor: pointer;
 }
 
 .caLINEdar-table-cell.active:hover {
   border: 1px solid #efefef;
   background: #efefef;
-}
-
-.caLINEdar-table-header > .caLINEdar-table-cell:hover {
-  border: 1px solid transparent;
-  background: unset;
-  cursor: default;
 }
 
 .caLINEdar-year-picker > .caLINEdar-table,

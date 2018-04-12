@@ -51,7 +51,7 @@ const caLINEdar = {
   /**
    * A table looks like below:
    * <table class="caLINEdar-table">
-   *   <tr class="caLINEdar-table-header">
+   *   <tr class="caLINEdar-table-headers">
    *     <th class="caLINEdar-table-cell">Su</th>
    *     <th class="caLINEdar-table-cell">Mo</th>
    *     <th class="caLINEdar-table-cell">Tu</th>
@@ -85,7 +85,7 @@ const caLINEdar = {
         this._tableThTemplate.classList.add("caLINEdar-table-cell");
       }
       let header = this._createTableRow({ cellCount: 0 });
-      header.classList.add("caLINEdar-table-header");
+      header.classList.add("caLINEdar-table-headers");
       for (let i = 0; i < options.headerCount; ++i) {
         header.appendChild(this._tableThTemplate.cloneNode(false));
       }
@@ -113,7 +113,7 @@ const caLINEdar = {
     return tr;
   },
 
-  _updateTableCells(table, pickedIdx, values) {
+  _updateTableCells(table, values) {
     let rows = table.querySelectorAll(".caLINEdar-table-values");
     let cellCount = rows[0].querySelectorAll(".caLINEdar-table-cell").length;
 
@@ -132,13 +132,23 @@ const caLINEdar = {
       let cells = row.querySelectorAll(".caLINEdar-table-cell");
       for (let j = 0; j < cellCount; ++j) {
         if (data && data[j]) {
-          if (i * cellCount + j === pickedIdx) {
+          cells[j].textContent = data[j].text; 
+          cells[j].setAttribute("data-caLINEdar-value", data[j].value);
+          cells[j].classList.add("active");
+          if (data[j].picked) {
             cells[j].classList.add("picked");
           }
-          cells[j].textContent = data[j]; 
-          cells[j].classList.add("active");
+          if (data[j].special) {
+            cells[j].classList.add("special");
+          }
+          if (data[j].grayOutDate) {
+            cells[j].classList.add("gray-out-date");
+          }
         } else {
+          cells[j].classList.remove("picked");
           cells[j].classList.remove("active");
+          cells[j].classList.remove("special");
+          cells[j].classList.remove("gray-out-date");
         }
       }
     }
@@ -174,39 +184,65 @@ const caLINEdar = {
     return picker;
   },
 
-  _createYearPicker(pickedYrsIdx, yrs) {
+  _createYearPicker(years) {
     let picker = this._createEmptyPicker({
-      headerCount: 0,
       pickerBtnCount: 1,
+      headerCount: 0,
       cellCount: 3,
       rowCount: 3,
     });
     picker.classList.add("caLINEdar-year-picker");
 
     let btn = picker.querySelector(".caLINEdar-panel__btn.picker-btn");
-    btn.textContent = yrs[pickedYrsIdx];
+    btn.textContent = years.find(y => y.picked).text;
 
     let table = picker.querySelector(".caLINEdar-table");
-    this._updateTableCells(table, pickedYrsIdx, yrs);
+    this._updateTableCells(table, years);
 
     return picker;
   },
 
-  _createMonthPicker(pickedMonthIdx, months) {
+  _createMonthPicker(months) {
     let picker = this._createEmptyPicker({
-      headerCount: 0,
       pickerBtnCount: 1,
+      headerCount: 0,
       cellCount: 4,
       rowCount: 3,
     });
-    picker.classList.add("caLINEdar-year-picker");
+    picker.classList.add("caLINEdar-month-picker");
 
     let btn = picker.querySelector(".caLINEdar-panel__btn.picker-btn");
-    btn.textContent = months[pickedMonthIdx];
+    btn.textContent = months.find(m => m.picked).text;
 
     let table = picker.querySelector(".caLINEdar-table");
-    this._updateTableCells(table, pickedMonthIdx, months);
+    this._updateTableCells(table, months);
 
+    return picker;
+  },
+
+  _createDatePicker(pickerBtns, weekHeaders, dates) {
+    let picker = this._createEmptyPicker({
+      pickerBtnCount: 2,
+      headerCount: 7,
+      cellCount: 7,
+      rowCount: 6,
+    });
+    picker.classList.add("caLINEdar-date-picker");
+
+    let btns = picker.querySelectorAll(".caLINEdar-panel__btn.picker-btn");
+    for (let i = 0; i < pickerBtns.length; ++i) {
+      btns[i].textContent = pickerBtns[i].text;
+      btns[i].setAttribute("data-caLINEdar-value", pickerBtns[i].value);
+    }
+
+    let table = picker.querySelector(".caLINEdar-table");
+    let headers = table.querySelector(".caLINEdar-table-headers")
+                       .querySelectorAll(".caLINEdar-table-cell");
+    for (let i = 0; i < headers.length; ++i) {
+      headers[i].textContent = weekHeaders[i];
+    }
+
+    this._updateTableCells(table, dates);
     return picker;
   },
 
