@@ -2,6 +2,8 @@ $caLINEdar-font-color: #3a3a3a;
 $caLINEdar-panel-height: 2em;
 $caLINEdar-table-max-height: 15.75em;
 $caLINEdar-height: $caLINEdar-panel-height + $caLINEdar-table-max-height + 0.5em;
+$caLINEdar-width: 18.75em; // 300px = 18.75em @ 1em is 16px
+
 
 .caLINEdar-input {
   width: 100%;
@@ -23,8 +25,7 @@ $caLINEdar-height: $caLINEdar-panel-height + $caLINEdar-table-max-height + 0.5em
 }
 
 .caLINEdar {
-  // 300px = 18.75em @ 1em is 16px
-  width: 18.75em;
+  width: $caLINEdar-width;
   height: $caLINEdar-height;
   padding: 4px;
   border: 1px solid #ccc;
@@ -32,55 +33,79 @@ $caLINEdar-height: $caLINEdar-panel-height + $caLINEdar-table-max-height + 0.5em
   box-sizing: border-box;
   box-shadow: 0 6px 18px rgba(0,0,0,0.15);
   background: #fff;
-  position: absolute;
+  position: fixed;
   z-index: 999;
 }
 
-$caLINEdar-before-elm-border-width: 7px;
-$caLINEdar-after-elm-border-width: $caLINEdar-before-elm-border-width - 1px;
-$caLINEdar-before-elm-top: -7px;
-$caLINEdar-after-elm-top: $caLINEdar-before-elm-top + 1px;
-$caLINEdar-before-elm-left: 9px;
-$caLINEdar-after-elm-left: $caLINEdar-before-elm-left + 1px;
-$caLINEdar-before-elm-btm: $caLINEdar-before-elm-top;
-$caLINEdar-after-elm-btm: $caLINEdar-after-elm-top;
+
+@function get-arrow-var($name) {
+  $caLINEdar-before-elm-border-width: 7px;
+  $caLINEdar-before-elm-top: -7px;
+  $caLINEdar-before-elm-left: 16px;
+  $caLINEdar-before-elm-btm: $caLINEdar-before-elm-top;
+  $caLINEdar-after-elm-border-width: $caLINEdar-before-elm-border-width - 1px;
+  $caLINEdar-after-elm-top: $caLINEdar-before-elm-top + 1px;
+  $caLINEdar-after-elm-left: $caLINEdar-before-elm-left + 1px;
+  $caLINEdar-after-elm-btm: $caLINEdar-after-elm-top;
+
+  @if $name == "before-border-width" { @return $caLINEdar-before-elm-border-width; }
+  @if $name == "after-border-width" { @return $caLINEdar-after-elm-border-width; }
+  @if $name == "before-top" { @return $caLINEdar-before-elm-top; }
+  @if $name == "after-top" { @return $caLINEdar-after-elm-top; }
+  @if $name == "before-left" { @return $caLINEdar-before-elm-left; }
+  @if $name == "before-right" { @return $caLINEdar-before-elm-left; }
+  @if $name == "after-left" { @return $caLINEdar-after-elm-left; }
+  @if $name == "after-right" { @return $caLINEdar-after-elm-left; }
+  @if $name == "before-btm" { @return $caLINEdar-before-elm-btm; }
+  @if $name == "after-btm" { @return $caLINEdar-after-elm-btm; }
+}
 
 .caLINEdar::before {
   content: '';
   display: block;
   border-top: 0;
-  border-left: $caLINEdar-before-elm-border-width solid transparent;
-  border-right: $caLINEdar-before-elm-border-width solid transparent;
-  border-bottom: $caLINEdar-before-elm-border-width solid #bbb;
+  border-left: get-arrow-var("before-border-width") solid transparent;
+  border-right: get-arrow-var("before-border-width") solid transparent;
+  border-bottom: get-arrow-var("before-border-width") solid #bbb;
   position: absolute;
-  top: $caLINEdar-before-elm-top;
-  left: $caLINEdar-before-elm-left;
+  top: get-arrow-var("before-top");
+  left: get-arrow-var("before-left");
 }
 
 .caLINEdar::after {
   content: '';
   display: block;
   border-top: 0;
-  border-left: $caLINEdar-after-elm-border-width solid transparent;
-  border-right: $caLINEdar-after-elm-border-width solid transparent;
-  border-bottom: $caLINEdar-after-elm-border-width solid #fff;
+  border-left: get-arrow-var("after-border-width") solid transparent;
+  border-right: get-arrow-var("after-border-width") solid transparent;
+  border-bottom: get-arrow-var("after-border-width") solid #fff;
   position: absolute;
-  top: $caLINEdar-after-elm-top;
-  left: $caLINEdar-after-elm-left;
+  top: get-arrow-var("after-top");
+  left: get-arrow-var("after-left");
 }
 
-.caLINEdar.caLINEdar--on-top::before {
-  border-top: $caLINEdar-before-elm-border-width solid #bbb;
+.caLINEdar.on-top::before {
+  border-top: get-arrow-var("before-border-width") solid #bbb;
   border-bottom: 0;
   top: unset;
-  bottom: $caLINEdar-before-elm-btm;
+  bottom: get-arrow-var("before-btm");
 }
 
-.caLINEdar.caLINEdar--on-top::after {
-  border-top: $caLINEdar-after-elm-border-width solid #fff;
+.caLINEdar.on-top::after {
+  border-top: get-arrow-var("after-border-width") solid #fff;
   border-bottom: 0;
   top: unset;
-  bottom: $caLINEdar-after-elm-btm;
+  bottom: get-arrow-var("after-btm");
+}
+
+.caLINEdar.arrow-on-right::before {
+  left: unset;
+  right: get-arrow-var("before-right");
+}
+
+.caLINEdar.arrow-on-right::after {
+  left: unset;
+  right: get-arrow-var("after-right");
 }
 
 .caLINEdar-panel,

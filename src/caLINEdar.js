@@ -220,36 +220,122 @@ const caLINEdar = {
     return picker;
   },
 
-  _createDatePicker(pickerBtns, weekHeaders, dates) {
-    let picker = this._createEmptyPicker({
-      pickerBtnCount: 2,
-      headerCount: 7,
-      cellCount: 7,
-      rowCount: 6,
-    });
-    picker.classList.add("caLINEdar-date-picker");
-
-    let btns = picker.querySelectorAll(".caLINEdar-panel__btn.picker-btn");
-    for (let i = 0; i < pickerBtns.length; ++i) {
-      btns[i].textContent = pickerBtns[i].text;
-      btns[i].setAttribute("data-caLINEdar-value", pickerBtns[i].value);
+  _openCalendarHolder() {
+    if (!this._calendar) {
+      this._calendar = this._doc.createElement("div");
+      this._calendar.classList.add("caLINEdar");
+      this._doc.body.appendChild(this._calendar);
     }
-
-    let table = picker.querySelector(".caLINEdar-table");
-    let headers = table.querySelector(".caLINEdar-table-headers")
-                       .querySelectorAll(".caLINEdar-table-cell");
-    for (let i = 0; i < headers.length; ++i) {
-      headers[i].textContent = weekHeaders[i];
-    }
-
-    this._updateTableCells(table, dates);
-    return picker;
+    this._calendar.style.display = "";
   },
 
-  _createCalendar() {
-    let calendar = this._doc.createElement("div");
-    calendar.classList.add("caLINEdar");
-    return calendar;
+  _closeCalendarHolder() {
+    if (this._calendar) {
+      this._calendar.style.display = "none";
+    }
+  },
+
+  async positionCalendar(window, anchorInput) {
+    if (!this._calendar) {
+      return;
+    }
+    return new Promise(resolve => {
+      window.requestAnimationFrame(() => {
+        let winW = window.innerWidth;
+        let winH = window.innerHeight;
+
+        let calendarW = parseInt(this._calendar.getAttribute("data-caLINEdar-width"));
+        let calendarH = parseInt(this._calendar.getAttribute("data-caLINEdar-height"));
+        if (!calendarW) {
+          // `getBoundingClientRect` is expensive so cache it. 
+          let rect = this._calendar.getBoundingClientRect();
+          calendarW = rect.width;
+          calendarH = rect.height;
+          this._calendar.setAttribute("data-caLINEdar-width", calendarW);
+          this._calendar.setAttribute("data-caLINEdar-height", calendarH)
+        }
+
+        // Unfortunately, we can't cache `anchorInput`
+        // because its dimesion may change, not in our control.
+        let inputRect = anchorInput.getBoundingClientRect();
+
+        // First decdie our calendar on top of or below `anchorInput`
+        if (winH - inputRect.bottom > calendarH + 10) {
+          // OK there is enough room below `anchorInput`
+          this._calendar.classList.remove("on-top");
+          this._calendar.style.top = (inputRect.bottom + 8) + "px";
+        } else {
+          this._calendar.classList.add("on-top");
+          this._calendar.style.top = (inputRect.top - calendarH - 8) + "px";
+        }
+
+        // Second decdie our calendar's horizontal postion
+        if (winW - inputRect.left > calendarW + 10) {
+          // OK there is enough room on the right side of `anchorInput`
+          this._calendar.classList.remove("arrow-on-right");
+          this._calendar.style.left = inputRect.left + "px";
+        } else {
+          this._calendar.classList.add("arrow-on-right");
+          this._calendar.style.left = (inputRect.right - calendarW) + "px";
+        }
+
+        resolve();
+      });
+    });
+  },
+
+  async openCalendar(anchorInput, pickerBtns, weekHeaders, dates) {
+    this._openCalendarHolder();
+    await this.openDatePicker(pickerBtns, weekHeaders, dates);
+    await this.positionCalendar(this._win, anchorInput);
+  },
+
+  openDatePicker(pickerBtns, weekHeaders, dates) {
+    if (!this._calendar) {
+      throw new Error("Should open the calendar once first then open the data picker");
+    }
+    if (!this._datePicker) {
+      this._datePicker = this._createEmptyPicker({
+        pickerBtnCount: 2,
+        headerCount: 7,
+        cellCount: 7,
+        rowCount: 6,
+      });
+      this._datePicker.classList.add("caLINEdar-date-picker");
+      this._calendar.appendChild(this._datePicker);
+    }
+    this._datePicker.style.display = "";
+    return this.updateDatePicker(pickerBtns, weekHeaders, dates);
+  },
+
+  closeDatePicker() {
+    if (this._datePicker) {
+      this._datePicker.style.display = "none";
+    }
+  },
+
+  async updateDatePicker(pickerBtns, weekHeaders, dates) {
+    return new Promise(resolve => {
+      this._win.requestAnimationFrame(() => {
+        let picker = this._datePicker;
+
+        let btns = picker.querySelectorAll(".caLINEdar-panel__btn.picker-btn");
+        for (let i = 0; i < pickerBtns.length; ++i) {
+          btns[i].textContent = pickerBtns[i].text;
+          btns[i].setAttribute("data-caLINEdar-value", pickerBtns[i].value);
+        }
+
+        let table = picker.querySelector(".caLINEdar-table");
+        let headers = table.querySelector(".caLINEdar-table-headers")
+                           .querySelectorAll(".caLINEdar-table-cell");
+        for (let i = 0; i < headers.length; ++i) {
+          headers[i].textContent = weekHeaders[i];
+        }
+
+        this._updateTableCells(table, dates);
+        resolve();
+      });
+    });
   },
 
   // UI methods end
