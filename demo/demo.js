@@ -1,4 +1,5 @@
-import caLINEdar from "../src/caLINEdar";
+import caLINEdar from "../src/index";
+import createIranSolarHijriCalender from "../src/IranSolarHijriCalender";
 
 function getFakeYearArgs() {
   let yrs = 
@@ -67,3 +68,5 @@ caLINEdar.openMonthPicker(months);
 
 let yrs = getFakeYearArgs();
 caLINEdar.opneYearPicker(yrs);
+
+window.iranCalendar = createIranSolarHijriCalender(caLINEdar);

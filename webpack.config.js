@@ -8,7 +8,7 @@ options.outputName = production ? "[name].bundle.js" : "[name].dev.bundle.js";
 
 module.exports = {
   entry: {
-   caLINEdar: "./src/caLINEdar.js",
+   index: "./src/index.js",
    "demo/demo": "./demo/demo.js"
   },
   

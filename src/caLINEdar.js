@@ -1,10 +1,21 @@
-import "./caLINEdar.scss";
+import caLINEdarCalender from "./caLINEdarCalender";
 
 const caLINEdar = {
+  caLINEdarCalender: caLINEdarCalender,
+
   init(window) {
     this._win = window;
     this._doc = window.document;
   },
+
+  // Util methods
+
+  isLeapYear(year) {
+    return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
+  },
+
+  // Util methods end
+
 
   // UI methods
 
