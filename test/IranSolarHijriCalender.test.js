@@ -1,3 +1,4 @@
+import testUtil from "./testUtil";
 import caLINEdar from "../src/caLINEdar";
 import createIranSolarHijriCalender from "../src/IranSolarHijriCalender";
 
@@ -152,5 +153,27 @@ describe("IranSolarHijriCalender", () => {
     ];
     let dates = iranCalendar.getDates(1397, 0);
     expect(JSON.stringify(dates)).toBe(JSON.stringify(expected));
+  });
+
+  it("should fallback to the 1st date for getting now", () => {
+    testUtil.overrideCaLINEdar(
+      caLINEdar, "getNowInLocalTimezone", testUtil.fakeGetNowInLocalTimezone);
+
+    let expected = { year: 1354, month: 0, date: 1 };
+    let now = iranCalendar.getNow({ fallback: "1st-date" });
+    expect(JSON.stringify(now)).toBe(JSON.stringify(expected));
+
+    testUtil.restoreCaLINEdar(caLINEdar, "getNowInLocalTimezone");
+  });
+
+  it("should fallback to the last date for getting now", () => {
+    testUtil.overrideCaLINEdar(
+      caLINEdar, "getNowInLocalTimezone", testUtil.fakeGetNowInLocalTimezone);
+    
+    let expected = { year: 1419, month: 11, date: 29 };
+    let now = iranCalendar.getNow({ fallback: "last-date" });
+    expect(JSON.stringify(now)).toBe(JSON.stringify(expected));
+
+    testUtil.restoreCaLINEdar(caLINEdar, "getNowInLocalTimezone");
   });
 });

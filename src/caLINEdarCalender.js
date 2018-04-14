@@ -29,6 +29,25 @@ class CaLINEdarCalender {
     throw new Error("formatDateString not implemented");
   }
 
+  /**
+   * Get today's date values per this calendar
+   *
+   * @params options {Object} Options are:
+   *    - fallback {String} "1st-date" | "last-date"
+   *
+   * @return {Object} 
+   *    An object with
+   *    - year {integer} the today's year value per this calendar
+   *    - month {integer} the today's month value per this calendar
+   *    - date {integer} the today's date value per this calendar
+   *    But if unable to get one (Maybe some custom calendar has really a limited date range),
+   *    `null` returned if no `fallback` option
+   *    The 1st/last date in this calendar if `fallback` option given
+   */
+  getNow(options) {
+    throw new Error("getNow not implemented");
+  }
+
   getMonths(year) {
     throw new Error("getMonths not implemented");
   }

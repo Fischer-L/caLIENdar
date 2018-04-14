@@ -234,6 +234,35 @@ function createIranSolarHijriCalender(caLINEdar) {
       return [d, m, y, "/"];
     }
 
+    getNow(options = {}) {
+      let now = caLINEdar.getNowInLocalTimezone();
+      let local = this.convertJSDate2LocalDate(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate()
+      );
+      if (!local) {
+        let fallback = null;
+        switch (options.fallback) {
+          case "1st-date":
+            fallback = IRAN_YEAR_MAP["1354"].jsDate.start;
+            break;
+
+          case "last-date":
+            fallback = IRAN_YEAR_MAP["1419"].jsDate.end;
+            break;
+        }
+        if (fallback) {
+          local = this.convertJSDate2LocalDate(
+            fallback.year,
+            fallback.month,
+            fallback.date
+          );
+        }
+      }
+      return local;
+    }
+
     getMonths() {
       let months = [];
       IRAN_MONTH_MAP.forEach(m => {
@@ -313,6 +342,12 @@ function createIranSolarHijriCalender(caLINEdar) {
     }
 
     convertJSDate2LocalDate(year, month, date) {
+      if (!Number.isInteger(year) ||
+          !Number.isInteger(month) ||
+          !Number.isInteger(date)) {
+        return null;
+      }
+
       let jsDate = null;
       try {
         // Always good to make sure the date correct
