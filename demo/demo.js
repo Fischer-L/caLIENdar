@@ -55,18 +55,24 @@ function getFakeDatePickerArgs() {
   };
 }
 
+function openFakeCalendar() {
+  let { pickerBtns, weekHeaders, dates } = getFakeDatePickerArgs();
+  let container = document.querySelector(".date-input-container");
+  let anchorInput = caLINEdar._createInput();
+  container.appendChild(anchorInput);
+  caLINEdar.openCalendar(anchorInput, pickerBtns, weekHeaders, dates);
+
+  let months = getFakeMonthArgs();
+  caLINEdar.openMonthPicker(months);
+
+  let yrs = getFakeYearArgs();
+  caLINEdar.opneYearPicker(yrs);
+}
+
 caLINEdar.init(window);
-
-let { pickerBtns, weekHeaders, dates } = getFakeDatePickerArgs();
-let container = document.querySelector(".date-input-container");
-let anchorInput = caLINEdar._createInput();
-container.appendChild(anchorInput);
-caLINEdar.openCalendar(anchorInput, pickerBtns, weekHeaders, dates);
-
-let months = getFakeMonthArgs();
-caLINEdar.openMonthPicker(months);
-
-let yrs = getFakeYearArgs();
-caLINEdar.opneYearPicker(yrs);
-
+let iranDatePicker = document.querySelector("#iranian-date-picker");
 window.iranCalendar = createIranSolarHijriCalender(caLINEdar);
+window.iranDateInput = caLINEdar.createDateInput({
+  mountElem: iranDatePicker,
+  calendar: window.iranCalendar,
+});

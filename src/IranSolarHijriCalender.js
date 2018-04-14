@@ -207,13 +207,13 @@ function createIranSolarHijriCalender(caLINEdar) {
         return false;
       }
 
-      if (typeof month === "number") {
+      if (caLINEdar.isInt(month)) {
         let m = IRAN_MONTH_MAP.get(month);
         if (!m) {
           return false;
         }
 
-        if (typeof date === "number") {
+        if (caLINEdar.isInt(date)) {
           if (date <= 0 || date > this._calcDayNumbersByLocal(m.value, y.leapYear)) {
             return false;
           }
@@ -224,14 +224,33 @@ function createIranSolarHijriCalender(caLINEdar) {
     }
 
     formatDateString(year, month, date) {
-      if (!this.isDateInCalendar(year, month, date)) {
-        console.warn(`Unable to format date string. The year: ${year}, month: ${month}, date: ${date} is out of the valid range.`);
-        return null;
+      let y = IRAN_YEAR_MAP[year];
+      if (y) {
+        y = "" + y.value;
       }
-      let y = "" + year;
-      let m = IRAN_MONTH_MAP.get(month).text;
-      let d = date < 10 ? "0" + date : "" + date;
-      return [d, m, y, "/"];
+
+      let m = IRAN_MONTH_MAP.get(month)
+      if (m) {
+        m = m.text;
+      }
+
+      let d = date;
+      if (caLINEdar.isInt(d)) {
+        d = d < 10 ? "0" + d : "" + d;
+      }
+
+      let format = null;
+      if (y && m && d) {
+        format = [d, m, y];
+      } else if (y && m) {
+        format = [m, y];
+      } else if (m && d) {
+        format = [d, m];
+      }
+      if (format) {
+        format.push("/");
+      }
+      return format;
     }
 
     getNow(options = {}) {
@@ -306,7 +325,7 @@ function createIranSolarHijriCalender(caLINEdar) {
           date: i,
           day: currentDay % 7
         };
-        d.special = d.day === 0;
+        d.holiday = d.day === 0;
         dates.push(d);
         currentDay = d.day + 1;
       }
@@ -342,9 +361,9 @@ function createIranSolarHijriCalender(caLINEdar) {
     }
 
     convertJSDate2LocalDate(year, month, date) {
-      if (!Number.isInteger(year) ||
-          !Number.isInteger(month) ||
-          !Number.isInteger(date)) {
+      if (!caLINEdar.isInt(year) ||
+          !caLINEdar.isInt(month) ||
+          !caLINEdar.isInt(date)) {
         return null;
       }
 

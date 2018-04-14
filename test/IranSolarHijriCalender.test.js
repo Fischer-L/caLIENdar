@@ -78,10 +78,26 @@ describe("IranSolarHijriCalender", () => {
     expect(iranCalendar.isDateInCalendar(MAX_VALID_IRAN_YEAR, MAX_VALID_IRAN_MONTH, 30)).toBe(false);
   });
 
-  it("should format a date string", () => {
-    let dateString = iranCalendar.formatDateString(1354, 0, 1);
-    let token = dateString.pop();
-    expect(dateString.join(token)).toBe("01/Farvardin/1354");
+  it("should format date strings", () => {
+    const data = [
+      {
+        date: [1354, 0, 1],
+        expected: "01/Farvardin/1354",
+      },
+      {
+        date: [1354, 0, null],
+        expected: "Farvardin/1354",
+      },
+      {
+        date: [null, 0, 1],
+        expected: "01/Farvardin",
+      },
+    ];
+    data.forEach(d => {
+      let dateString = iranCalendar.formatDateString(...d.date);
+      let token = dateString.pop();
+      expect(dateString.join(token)).toBe(d.expected);
+    });
   });
 
   it("should return months supported", () => {
@@ -119,37 +135,37 @@ describe("IranSolarHijriCalender", () => {
 
   it("should return dates", () => {
     let expected = [
-      { year: 1397, month: 0, date: 1, day: 3, special: false },
-      { year: 1397, month: 0, date: 2, day: 4, special: false },
-      { year: 1397, month: 0, date: 3, day: 5, special: false },
-      { year: 1397, month: 0, date: 4, day: 6, special: false },
-      { year: 1397, month: 0, date: 5, day: 0, special: true },
-      { year: 1397, month: 0, date: 6, day: 1, special: false },
-      { year: 1397, month: 0, date: 7, day: 2, special: false },
-      { year: 1397, month: 0, date: 8, day: 3, special: false },
-      { year: 1397, month: 0, date: 9, day: 4, special: false },
-      { year: 1397, month: 0, date: 10, day: 5, special: false },
-      { year: 1397, month: 0, date: 11, day: 6, special: false },
-      { year: 1397, month: 0, date: 12, day: 0, special: true },
-      { year: 1397, month: 0, date: 13, day: 1, special: false },
-      { year: 1397, month: 0, date: 14, day: 2, special: false },
-      { year: 1397, month: 0, date: 15, day: 3, special: false },
-      { year: 1397, month: 0, date: 16, day: 4, special: false },
-      { year: 1397, month: 0, date: 17, day: 5, special: false },
-      { year: 1397, month: 0, date: 18, day: 6, special: false },
-      { year: 1397, month: 0, date: 19, day: 0, special: true },
-      { year: 1397, month: 0, date: 20, day: 1, special: false },
-      { year: 1397, month: 0, date: 21, day: 2, special: false },
-      { year: 1397, month: 0, date: 22, day: 3, special: false },
-      { year: 1397, month: 0, date: 23, day: 4, special: false },
-      { year: 1397, month: 0, date: 24, day: 5, special: false },
-      { year: 1397, month: 0, date: 25, day: 6, special: false },
-      { year: 1397, month: 0, date: 26, day: 0, special: true },
-      { year: 1397, month: 0, date: 27, day: 1, special: false },
-      { year: 1397, month: 0, date: 28, day: 2, special: false },
-      { year: 1397, month: 0, date: 29, day: 3, special: false },
-      { year: 1397, month: 0, date: 30, day: 4, special: false },
-      { year: 1397, month: 0, date: 31, day: 5, special: false }
+      { year: 1397, month: 0, date: 1, day: 3, holiday: false },
+      { year: 1397, month: 0, date: 2, day: 4, holiday: false },
+      { year: 1397, month: 0, date: 3, day: 5, holiday: false },
+      { year: 1397, month: 0, date: 4, day: 6, holiday: false },
+      { year: 1397, month: 0, date: 5, day: 0, holiday: true },
+      { year: 1397, month: 0, date: 6, day: 1, holiday: false },
+      { year: 1397, month: 0, date: 7, day: 2, holiday: false },
+      { year: 1397, month: 0, date: 8, day: 3, holiday: false },
+      { year: 1397, month: 0, date: 9, day: 4, holiday: false },
+      { year: 1397, month: 0, date: 10, day: 5, holiday: false },
+      { year: 1397, month: 0, date: 11, day: 6, holiday: false },
+      { year: 1397, month: 0, date: 12, day: 0, holiday: true },
+      { year: 1397, month: 0, date: 13, day: 1, holiday: false },
+      { year: 1397, month: 0, date: 14, day: 2, holiday: false },
+      { year: 1397, month: 0, date: 15, day: 3, holiday: false },
+      { year: 1397, month: 0, date: 16, day: 4, holiday: false },
+      { year: 1397, month: 0, date: 17, day: 5, holiday: false },
+      { year: 1397, month: 0, date: 18, day: 6, holiday: false },
+      { year: 1397, month: 0, date: 19, day: 0, holiday: true },
+      { year: 1397, month: 0, date: 20, day: 1, holiday: false },
+      { year: 1397, month: 0, date: 21, day: 2, holiday: false },
+      { year: 1397, month: 0, date: 22, day: 3, holiday: false },
+      { year: 1397, month: 0, date: 23, day: 4, holiday: false },
+      { year: 1397, month: 0, date: 24, day: 5, holiday: false },
+      { year: 1397, month: 0, date: 25, day: 6, holiday: false },
+      { year: 1397, month: 0, date: 26, day: 0, holiday: true },
+      { year: 1397, month: 0, date: 27, day: 1, holiday: false },
+      { year: 1397, month: 0, date: 28, day: 2, holiday: false },
+      { year: 1397, month: 0, date: 29, day: 3, holiday: false },
+      { year: 1397, month: 0, date: 30, day: 4, holiday: false },
+      { year: 1397, month: 0, date: 31, day: 5, holiday: false }
     ];
     let dates = iranCalendar.getDates(1397, 0);
     expect(JSON.stringify(dates)).toBe(JSON.stringify(expected));

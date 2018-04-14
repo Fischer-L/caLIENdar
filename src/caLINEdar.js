@@ -29,11 +29,15 @@ const caLINEdar = {
       throw new Error(`Must provide a mounting element to mount the date input`);
     }
 
-    let caLINEdar = this;
     let input = this._createInput();
-    let dateInputParams = Object.assign({}, params, { input, caLINEdar });
+    let dateInputParams = Object.assign({}, params, { 
+      input, 
+      caLINEdar: this,
+      window: this._win
+    });
     delete dateInputParams.mountElem; // Delete unnecessary params
     let dateInput = new this.CaLINEdarDateInput(dateInputParams);
+    mountElem.appendChild(input);
     return dateInput;
   },
 
@@ -55,8 +59,43 @@ const caLINEdar = {
     return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
   },
 
+  /**
+   * @return {Date} A JS Date object meaning right now in the local time
+   */
+  getNowInLocalTimezone() {
+    // First make sure the time is always zero UTC offset. 
+    let now = (new Date()).toISOString();
+    let YYYY = parseInt(now.substr(0, 4));
+    let MM = parseInt(now.substr(5, 2)) - 1;
+    let DD = parseInt(now.substr(8, 2));
+    let hh = parseInt(now.substr(11, 2));
+    let mm = parseInt(now.substr(14, 2));
+    let ss = parseInt(now.substr(17, 2));
+    now = new Date(YYYY, MM, DD, hh, mm, ss);
+
+    // Recalculate `now` based on the timezone
+    return new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+  },
+
+  /**
+   * @param v {*} The value to test
+   * @return {bool} `true` if the given `v` beloings to Integer or `false`
+   */
+  isInt(v) {
+    if (Number.isInteger) {
+      return Number.isInteger(v);
+    }
+    // OK We are seeing IE!?
+    if (isNaN(v)) {
+      return false;
+    }
+    let x = parseFloat(v);
+    return (x | 0) === x;
+  },
+
   // Util methods end
 
+  MAX_COUNT_DATES_IN_DATE_PICKER: 6 * 7,
 
   // UI methods
 
@@ -193,7 +232,7 @@ const caLINEdar = {
           if (data[j].special) {
             cells[j].classList.add("special");
           }
-          if (data[j].grayOutDate) {
+          if (data[j].grayOut) {
             cells[j].classList.add("gray-out-date");
           }
         } else {
@@ -300,6 +339,14 @@ const caLINEdar = {
     });
   },
 
+  /**
+   * Open the calendar. Always open the date picker first.
+   *
+   * @param anchorInput {HTMLInputElement} the input at which the calendar is anchor
+   * @param pickerBtns, weekHeaders, dates {*} See `openDatePicker`
+   *
+   * @return {Promise} A promise
+   */
   async openCalendar(anchorInput, pickerBtns, weekHeaders, dates) {
     this._openCalendarHolder();
     await this.openDatePicker(pickerBtns, weekHeaders, dates);
@@ -308,9 +355,14 @@ const caLINEdar = {
     await this.positionCalendar(this._win, anchorInput);
   },
 
+  /**
+   * Must always call `openCalendar` first to have the calendar opened.
+   *
+   * @param pickerBtns, weekHeaders, dates {*} See `updateDatePicker`
+   */
   openDatePicker(pickerBtns, weekHeaders, dates) {
     if (!this._calendar) {
-      throw new Error("Should open the calendar once first then open the data picker");
+      throw new Error("Should open the calendar once first then open the date picker");
     }
     if (!this._datePicker) {
       // Yes we do the lazy creation for all the date, month, year pickers.
@@ -329,6 +381,9 @@ const caLINEdar = {
     return this.updateDatePicker(pickerBtns, weekHeaders, dates);
   },
 
+  /**
+   * Close the data picker
+   */
   closeDatePicker() {
     if (this._datePicker) {
       this._datePicker.style.display = "none";
@@ -338,11 +393,22 @@ const caLINEdar = {
   /**
    * Call this to update the date picker table
    *
-   * @params pickerBtns {Array} represent the buttons on the top of the picker.
+   * @param pickerBtns {Array} represent the buttons on the top of the picker.
    *                            Each button should contains
    *                            - text {String} the button title
    *                            - value {String} the data attribute value for this button,
    *                              which will be used to identify this button when clicking.
+   *
+   * @param weekHeaders {Array} The titles of days in a week (count is 7).
+   *                             The 1st one is displayed in the left-most.
+   *
+   * @param dates {Array} 
+   *    An array (count is `MAX_COUNT_DATES_IN_DATE_PICKER`) of dates to display. Each date is an object with
+   *    - text {String} The title of this date
+   *    - value {Integer} The data attribute value identifying this date
+   *    - picked {bool} whether this date is picked
+   *    - special {bool} whether this date should be highlighted as special
+   *    - grayOut {bool} whether this date should be gray out (Win over `special`)
    */
   async updateDatePicker(pickerBtns, weekHeaders, dates) {
     return new Promise(resolve => {
