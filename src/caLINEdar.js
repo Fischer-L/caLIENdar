@@ -1,12 +1,53 @@
 import CaLINEdarCalender from "./caLINEdarCalender";
+import CaLINEdarDateInput from "./caLINEdarDateInput";
 
 const caLINEdar = {
   CaLINEdarCalender,
+  CaLINEdarDateInput,
 
   init(window) {
     this._win = window;
     this._doc = window.document;
   },
+
+  // Date-picking methods
+
+  /**
+   * @param params {Object} the parameters to create a `CaLINEdarDateInput`, including
+   *    - mountElem {HTMLElement} The element where the input element sits. 
+   *                              One input element will be created for you so don't pass another one.
+   *    - The parameters for constructing `CaLINEdarDateInput` so please refer to that.
+   *
+   * @return {CaLINEdarDateInput} An instance of `CaLINEdarDateInput`
+   */
+  createDateInput(params) {
+    let {
+      mountElem
+    } = params;
+
+    if (!mountElem || !mountElem.appendChild) {
+      throw new Error(`Must provide a mounting element to mount the date input`);
+    }
+
+    let caLINEdar = this;
+    let input = this._createInput();
+    let dateInputParams = Object.assign({}, params, { input, caLINEdar });
+    delete dateInputParams.mountElem; // Delete unnecessary params
+    let dateInput = new this.CaLINEdarDateInput(dateInputParams);
+    return dateInput;
+  },
+
+  /**
+   * @param dateInput {CaLINEdarDateInput} the `dateInput` to set as the current one
+   */
+  setCurrentDateInput(dateInput) {
+    if (!dateInput || this._dateInput === dateInput) {
+      return;
+    }
+    this._dateInput = dateInput;
+  },
+
+  // Date-picking methods end
 
   // Util methods
 
@@ -294,6 +335,15 @@ const caLINEdar = {
     }
   },
 
+  /**
+   * Call this to update the date picker table
+   *
+   * @params pickerBtns {Array} represent the buttons on the top of the picker.
+   *                            Each button should contains
+   *                            - text {String} the button title
+   *                            - value {String} the data attribute value for this button,
+   *                              which will be used to identify this button when clicking.
+   */
   async updateDatePicker(pickerBtns, weekHeaders, dates) {
     return new Promise(resolve => {
       this._win.requestAnimationFrame(() => {
