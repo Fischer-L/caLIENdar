@@ -1,4 +1,4 @@
-class caLINEdarCalender {
+class CaLINEdarCalender {
 
   /**
    * 
@@ -32,4 +32,4 @@ class caLINEdarCalender {
   }
 }
 
-module.exports = caLINEdarCalender;
+module.exports = CaLINEdarCalender;

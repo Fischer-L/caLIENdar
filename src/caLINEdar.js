@@ -1,7 +1,7 @@
-import caLINEdarCalender from "./caLINEdarCalender";
+import CaLINEdarCalender from "./caLINEdarCalender";
 
 const caLINEdar = {
-  caLINEdarCalender: caLINEdarCalender,
+  CaLINEdarCalender,
 
   init(window) {
     this._win = window;

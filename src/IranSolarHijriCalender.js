@@ -194,7 +194,7 @@ const IRAN_DAYS_MAP = new Map([
 
 function createIranSolarHijriCalender(caLINEdar) {
 
-  class IranSolarHijriCalender extends caLINEdar.caLINEdarCalender {
+  class IranSolarHijriCalender extends caLINEdar.CaLINEdarCalender {
 
     constructor() {
       super();
