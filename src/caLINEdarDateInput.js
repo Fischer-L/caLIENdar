@@ -154,6 +154,7 @@ class CaLINEdarDateInput {
 
         let btnValue = target.getAttribute("data-caLINEdar-value");
         if (btnValue === "year-picker-btn") {
+          this._showYearPicker(value.year);
           return;
         }
         if (btnValue === "month-picker-btn") {
@@ -172,6 +173,10 @@ class CaLINEdarDateInput {
 
   _showMonthPicker(year, monthPicked) {
     this.caLINEdar.showMonthPicker(this._getMonthPickerParams(year, monthPicked));
+  }
+
+  _showYearPicker(yearPicked) {
+    this.caLINEdar.showYearPicker(this._getYearPickerParams(yearPicked));
   }
 
   _flipDatePicker(year, month, dir) {
@@ -225,6 +230,42 @@ class CaLINEdarDateInput {
     return {
       value,
       months
+    };
+  }
+
+  _getYearPickerParams(yearPicked) {
+    // Collect years to pick (we put the piced year in the center)
+    let years = [];
+    let half = Math.floor(this.caLINEdar.MAX_COUNT_YEAR_IN_YEAR_PICKER / 2);
+    for (let i = half; i > 0; --i) {
+      years.push(yearPicked - i);
+    }
+    years.push(yearPicked);
+    let rest = this.caLINEdar.MAX_COUNT_YEAR_IN_YEAR_PICKER - years.length;
+    for (let i = 1; i <= rest; ++i) {
+      years.push(yearPicked + i);
+    }
+
+    // Remove years no in the calendar
+    years = years.reduce((ys, y) => {
+      if (this._calendar.isDateInCalendar(y)) {
+        ys.push(y);
+      }
+      return ys;
+    }, []);
+
+    // Build the pramas
+    years = years.map(y => {
+      return {
+        text: y,
+        value: y,
+        picked: y === yearPicked
+      };
+    });
+    let value = this._serializeLocalDate({ year: yearPicked });
+    return {
+      value,
+      years
     };
   }
 

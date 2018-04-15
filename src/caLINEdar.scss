@@ -171,10 +171,6 @@ $caLINEdar-width: 18.75em; // 300px = 18.75em @ 1em is 16px
   border-collapse: separate;
 }
 
-.caLINEdar-year-picker > .caLINEdar-table {
-  width: 80%;
-}
-
 .caLINEdar-year-picker > .caLINEdar-table,
 .caLINEdar-month-picker > .caLINEdar-table {
   height: $caLINEdar-table-max-height - 2em;

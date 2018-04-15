@@ -254,7 +254,7 @@ const caLINEdar = {
    *        Each month is an object with:
    *        - text {String} The title of this month
    *        - value {Integer} The data attribute value identifying this month
-   *        - picked {bool} whether this date is picked
+   *        - picked {bool} whether this month is picked
    */
   showMonthPicker(params) {
     if (!this.isCalendarOpen()) {
@@ -269,13 +269,11 @@ const caLINEdar = {
         cellCount: 4,
         rowCount: 3,
       });
+      [ ".caLINEdar-panel__btn.left-btn", 
+        ".caLINEdar-panel__btn.right-btn"].forEach(cls => {
+          this._monthPicker.querySelector(cls).style.display = "none";
+        });
       this._monthPicker.classList.add("caLINEdar-month-picker");
-      [
-        ".caLINEdar-panel__btn.left-btn",
-        ".caLINEdar-panel__btn.right-btn"
-      ].forEach(cls => {
-        this._monthPicker.querySelector(cls).style.display = "none";
-      });
       this._calendar.appendChild(this._monthPicker);
     }
     this.closeDatePicker();
@@ -292,7 +290,18 @@ const caLINEdar = {
     }
   },
 
-  showYearPicker(years) {
+  /**
+   * @param params {Object} The parameters are:
+   *    - value {String} The data attribute value identifing year
+   *
+   *    - months {Array} 
+   *        An array (count is `MAX_COUNT_YEAR_IN_YEAR_PICKER`) of years to display.
+   *        Each year is an object with:
+   *        - text {String} The title of this year
+   *        - value {Integer} The data attribute value identifying this year
+   *        - picked {bool} whether this year is picked
+   */
+  showYearPicker(params) {
     if (!this.isCalendarOpen()) {
       console.warn("Should open the calendar once first then show the year picker");
       return;
@@ -311,12 +320,14 @@ const caLINEdar = {
     this.closeDatePicker();
     this.closeMonthPicker();
     this._yearPicker.style.display = "";
-    return this._updateYearPicker(years);
+    this._yearPicker.setAttribute("data-caLINEdar-value", params.value);
+    return this._updateYearPicker(params.years);
   },
 
   closeYearPicker() {
     if (this._yearPicker) {
       this._yearPicker.style.display = "none";
+      this._yearPicker.removeAttribute("data-caLINEdar-value");
     }
   },
 
@@ -329,6 +340,7 @@ const caLINEdar = {
   EVENT_PICKER_CLICK: "caLINEdar-on-picker-click",
   EVENT_CLICK_OUTSIDE_PICKER: "caLINEdar-on-click-outside",
 
+  MAX_COUNT_YEAR_IN_YEAR_PICKER: 9,
   MAX_COUNT_MONTHS_IN_MONTH_PICKER: 12,
   MAX_COUNT_DATES_IN_DATE_PICKER: 6 * 7,
 
