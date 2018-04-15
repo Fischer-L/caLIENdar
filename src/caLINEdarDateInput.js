@@ -139,18 +139,16 @@ class CaLINEdarDateInput {
   }
 
   _onPanelButtonClick(picker, target) {
-    let pickerValue = picker.getAttribute("data-caLINEdar-value");
+    let value = this._unserializeLocalDate(
+      picker.getAttribute("data-caLINEdar-value"));
     switch (picker.id) {
       case this.caLINEdar.ID_DATE_PICKER:
-        pickerValue = pickerValue.split("-");
-        let y = parseInt(pickerValue[0]);
-        let m = parseInt(pickerValue[1]);
         if (target.classList.contains("left-btn")) {
-          this._flipDatePicker(y, m, "left");
+          this._flipDatePicker(value.year, value.month, "left");
           return;
         }
         if (target.classList.contains("right-btn")) {
-          this._flipDatePicker(y, m, "right");
+          this._flipDatePicker(value.year, value.month, "right");
           return;
         }
         break;
@@ -195,7 +193,7 @@ class CaLINEdarDateInput {
 
     let dates = this._getLocalDatesToDisplay(year, month, datePicked);
     
-    let value = [ year, month ].join("-");
+    let value = this._serializeLocalDate({ year, month });
     return {
       dates,
       value,
@@ -235,16 +233,11 @@ class CaLINEdarDateInput {
   }
 
   _serializeLocalDate(date) {
-    return `${date.year}-${date.month}-${date.date}`;
+    return JSON.stringify(date);
   }
 
   _unserializeLocalDate(dateStr) {
-    dateStr = dateStr.split("-");
-    return {
-      year: dateStr[0],
-      month: dateStr[1],
-      date: dateStr[2]
-    }
+    return JSON.parse(dateStr);
   }
 
   _calcPrevLocalMonth(year, month, months) {
