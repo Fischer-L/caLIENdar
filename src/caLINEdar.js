@@ -156,7 +156,7 @@ const caLINEdar = {
    * Open the calendar. Always open the date picker first.
    *
    * @param anchorInput {HTMLInputElement} the input at which the calendar is anchor
-   * @param pickerBtns, weekHeaders, dates {*} See `openDatePicker`
+   * @param pickerBtns, weekHeaders, dates {*} See `showDatePicker`
    *
    * @return {Promise} A promise
    */
@@ -171,7 +171,7 @@ const caLINEdar = {
     // This is to avoid a *flash* during positioning.
     this._calendar.style.visibility = "hidden";
     this._calendar.setAttribute("data-caLINEdar-opened", true);
-    await this.openDatePicker(pickerBtns, weekHeaders, dates);
+    await this.showDatePicker(pickerBtns, weekHeaders, dates);
     // Let's always position the calendar after our picker is populated
     // so as to make sure the correct dimension is layouted when positioning. 
     await this.positionCalendar(this._win, anchorInput);
@@ -190,42 +190,6 @@ const caLINEdar = {
   /**
    * Must always call `openCalendar` first to have the calendar opened.
    *
-   * @param pickerBtns, weekHeaders, dates {*} See `updateDatePicker`
-   */
-  openDatePicker(pickerBtns, weekHeaders, dates) {
-    if (!this.isCalendarOpen()) {
-      throw new Error("Should open the calendar once first then open the date picker");
-    }
-    if (!this._datePicker) {
-      // Yes we do the lazy creation for all the date, month, year pickers.
-      this._datePicker = this._createEmptyPicker({
-        id: this.ID_DATE_PICKER,
-        pickerBtnCount: 2,
-        headerCount: 7,
-        cellCount: 7,
-        rowCount: 6,
-      });
-      this._datePicker.classList.add("caLINEdar-date-picker");
-      this._calendar.appendChild(this._datePicker);
-    }
-    this.closeYearPicker();
-    this.closeMonthPicker();
-    this._datePicker.style.display = "";
-    return this.updateDatePicker(pickerBtns, weekHeaders, dates);
-  },
-
-  /**
-   * Close the data picker
-   */
-  closeDatePicker() {
-    if (this._datePicker) {
-      this._datePicker.style.display = "none";
-    }
-  },
-
-  /**
-   * Call this to update the date picker table
-   *
    * @param pickerBtns {Array} represent the buttons on the top of the picker.
    *                            Each button should contains
    *                            - text {String} the button title
@@ -243,33 +207,42 @@ const caLINEdar = {
    *    - special {bool} whether this date should be highlighted as special
    *    - grayOut {bool} whether this date should be gray out (Win over `special`)
    */
-  async updateDatePicker(pickerBtns, weekHeaders, dates) {
-    return new Promise(resolve => {
-      this._win.requestAnimationFrame(() => {
-        let picker = this._datePicker;
-
-        let btns = picker.querySelectorAll(".caLINEdar-panel__btn.picker-btn");
-        for (let i = 0; i < pickerBtns.length; ++i) {
-          btns[i].textContent = pickerBtns[i].text;
-          btns[i].setAttribute("data-caLINEdar-value", pickerBtns[i].value);
-        }
-
-        let table = picker.querySelector(".caLINEdar-table");
-        let headers = table.querySelector(".caLINEdar-table-headers")
-                           .querySelectorAll(".caLINEdar-table-cell");
-        for (let i = 0; i < headers.length; ++i) {
-          headers[i].textContent = weekHeaders[i];
-        }
-
-        this._updateTableCells(table, dates);
-        resolve();
+  showDatePicker(pickerBtns, weekHeaders, dates) {
+    if (!this.isCalendarOpen()) {
+      console.warn("Should open the calendar once first then show the date picker");
+      return;
+    }
+    if (!this._datePicker) {
+      // Yes we do the lazy creation for all the date, month, year pickers.
+      this._datePicker = this._createEmptyPicker({
+        id: this.ID_DATE_PICKER,
+        pickerBtnCount: 2,
+        headerCount: 7,
+        cellCount: 7,
+        rowCount: 6,
       });
-    });
+      this._datePicker.classList.add("caLINEdar-date-picker");
+      this._calendar.appendChild(this._datePicker);
+    }
+    this.closeYearPicker();
+    this.closeMonthPicker();
+    this._datePicker.style.display = "";
+    return this._updateDatePicker(pickerBtns, weekHeaders, dates);
   },
 
-  openMonthPicker(months) {
+  /**
+   * Close the data picker
+   */
+  closeDatePicker() {
+    if (this._datePicker) {
+      this._datePicker.style.display = "none";
+    }
+  },
+
+  showMonthPicker(months) {
     if (!this.isCalendarOpen()) {
-      throw new Error("Should open the calendar once first then open the month picker");
+      console.warn("Should open the calendar once first then show the month picker");
+      return;
     }
     if (!this._monthPicker) {
       this._monthPicker = this._createEmptyPicker({
@@ -285,7 +258,7 @@ const caLINEdar = {
     this.closeDatePicker();
     this.closeYearPicker();
     this._monthPicker.style.display = "";
-    return this.updateMonthPicker(months);
+    return this._updateMonthPicker(months);
   },
 
   closeMonthPicker() {
@@ -294,24 +267,10 @@ const caLINEdar = {
     }
   },
 
-  updateMonthPicker(months) {
-    return new Promise(resolve => {
-      this._win.requestAnimationFrame(() => {
-        let picker = this._monthPicker;
-
-        let btn = picker.querySelector(".caLINEdar-panel__btn.picker-btn");
-        btn.textContent = months.find(m => m.picked).text;
-
-        let table = picker.querySelector(".caLINEdar-table");
-        this._updateTableCells(table, months);
-        resolve();
-      });
-    });
-  },
-
-  opneYearPicker(years) {
+  showYearPicker(years) {
     if (!this.isCalendarOpen()) {
-      throw new Error("Should open the calendar once first then open the year picker");
+      console.warn("Should open the calendar once first then show the year picker");
+      return;
     }
     if (!this._yearPicker) {
       this._yearPicker = this._createEmptyPicker({
@@ -327,27 +286,13 @@ const caLINEdar = {
     this.closeDatePicker();
     this.closeMonthPicker();
     this._yearPicker.style.display = "";
-    return this.updateYearPicker(years);
+    return this._updateYearPicker(years);
   },
 
   closeYearPicker() {
     if (this._yearPicker) {
       this._yearPicker.style.display = "none";
     }
-  },
-
-  updateYearPicker(years) {
-    return new Promise(resolve => {
-      this._win.requestAnimationFrame(() => {
-        let picker = this._yearPicker;
-
-        let btn = picker.querySelector(".caLINEdar-panel__btn.picker-btn");
-        btn.textContent = years.find(y => y.picked).text;
-
-        let table = picker.querySelector(".caLINEdar-table");
-        this._updateTableCells(table, years);
-      });
-    });
   },
 
   /** Public APIs end **/
@@ -411,6 +356,59 @@ const caLINEdar = {
   },
 
   // Events end
+
+  async _updateDatePicker(pickerBtns, weekHeaders, dates) {
+    return new Promise(resolve => {
+      this._win.requestAnimationFrame(() => {
+        let picker = this._datePicker;
+
+        let btns = picker.querySelectorAll(".caLINEdar-panel__btn.picker-btn");
+        for (let i = 0; i < pickerBtns.length; ++i) {
+          btns[i].textContent = pickerBtns[i].text;
+          btns[i].setAttribute("data-caLINEdar-value", pickerBtns[i].value);
+        }
+
+        let table = picker.querySelector(".caLINEdar-table");
+        let headers = table.querySelector(".caLINEdar-table-headers")
+                           .querySelectorAll(".caLINEdar-table-cell");
+        for (let i = 0; i < headers.length; ++i) {
+          headers[i].textContent = weekHeaders[i];
+        }
+
+        this._updateTableCells(table, dates);
+        resolve();
+      });
+    });
+  },
+
+  _updateMonthPicker(months) {
+    return new Promise(resolve => {
+      this._win.requestAnimationFrame(() => {
+        let picker = this._monthPicker;
+
+        let btn = picker.querySelector(".caLINEdar-panel__btn.picker-btn");
+        btn.textContent = months.find(m => m.picked).text;
+
+        let table = picker.querySelector(".caLINEdar-table");
+        this._updateTableCells(table, months);
+        resolve();
+      });
+    });
+  },
+
+  _updateYearPicker(years) {
+    return new Promise(resolve => {
+      this._win.requestAnimationFrame(() => {
+        let picker = this._yearPicker;
+
+        let btn = picker.querySelector(".caLINEdar-panel__btn.picker-btn");
+        btn.textContent = years.find(y => y.picked).text;
+
+        let table = picker.querySelector(".caLINEdar-table");
+        this._updateTableCells(table, years);
+      });
+    });
+  },
 
   _createInput() {
     if (!this._inputTemplate) {
