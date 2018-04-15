@@ -33,6 +33,7 @@ class CaLINEdarDateInput {
     }
 
     input.addEventListener("focus", this.onFocus);
+    input.addEventListener("blur", this.onBlur);
   }
 
   /**
@@ -114,7 +115,7 @@ class CaLINEdarDateInput {
 
   // Public APIs end
 
-  // Events
+  // DOM events
 
   onFocus = e => {
     this.caLINEdar.setCurrentDateInput(this);
@@ -122,7 +123,11 @@ class CaLINEdarDateInput {
     this._win.requestAnimationFrame(() => this.openCalendar());
   }
 
-  // Events end
+  onBlur = e => {
+    this.caLINEdar.closeCalendar();
+  }
+
+  // DOM events end
 
   _datesEqual(a, b) {
     return a && b && 

@@ -8,6 +8,7 @@ const caLINEdar = {
   init(window) {
     this._win = window;
     this._doc = window.document;
+    this._createCalendarHolder();
   },
 
   // Date-picking methods
@@ -275,18 +276,12 @@ const caLINEdar = {
     return picker;
   },
 
-  _openCalendarHolder() {
+  _createCalendarHolder() {
     if (!this._calendar) {
       this._calendar = this._doc.createElement("div");
       this._calendar.classList.add("caLINEdar");
-      this._doc.body.appendChild(this._calendar);
-    }
-    this._calendar.style.display = "";
-  },
-
-  _closeCalendarHolder() {
-    if (this._calendar) {
       this._calendar.style.display = "none";
+      this._doc.body.appendChild(this._calendar);
     }
   },
 
@@ -339,6 +334,10 @@ const caLINEdar = {
     });
   },
 
+  isCalendarOpen() {
+    return this._calendar && this._calendar.hasAttribute("data-caLINEdar-opened");
+  },
+
   /**
    * Open the calendar. Always open the date picker first.
    *
@@ -348,11 +347,30 @@ const caLINEdar = {
    * @return {Promise} A promise
    */
   async openCalendar(anchorInput, pickerBtns, weekHeaders, dates) {
-    this._openCalendarHolder();
+    if (!this._calendar) {
+      console.warn("Please call `init` first then manipuate the calendar");
+      return;
+    }
+
+    this._calendar.style.display = "";
+    // Set `hidden` first then remove it after positioning.
+    // This is to avoid a *flash* during positioning.
+    this._calendar.style.visibility = "hidden";
+    this._calendar.setAttribute("data-caLINEdar-opened", true);
     await this.openDatePicker(pickerBtns, weekHeaders, dates);
-    // Let's always position the calendar after making our picker visible
-    // so as to make sure the right dimension is populated when positioning. 
+    // Let's always position the calendar after our picker is populated
+    // so as to make sure the correct dimension is layouted when positioning. 
     await this.positionCalendar(this._win, anchorInput);
+    this._calendar.style.visibility = "";
+  },
+
+  closeCalendar() {
+    if (!this._calendar) {
+      console.warn("Please call `init` first then manipuate the calendar");
+      return;
+    }
+    this._calendar.style.display = "none";
+    this._calendar.removeAttribute("data-caLINEdar-opened");
   },
 
   /**
@@ -361,7 +379,7 @@ const caLINEdar = {
    * @param pickerBtns, weekHeaders, dates {*} See `updateDatePicker`
    */
   openDatePicker(pickerBtns, weekHeaders, dates) {
-    if (!this._calendar) {
+    if (!this.isCalendarOpen()) {
       throw new Error("Should open the calendar once first then open the date picker");
     }
     if (!this._datePicker) {
@@ -435,7 +453,7 @@ const caLINEdar = {
   },
 
   openMonthPicker(months) {
-    if (!this._calendar) {
+    if (!this.isCalendarOpen()) {
       throw new Error("Should open the calendar once first then open the month picker");
     }
     if (!this._monthPicker) {
@@ -476,7 +494,7 @@ const caLINEdar = {
   },
 
   opneYearPicker(years) {
-    if (!this._calendar) {
+    if (!this.isCalendarOpen()) {
       throw new Error("Should open the calendar once first then open the year picker");
     }
     if (!this._yearPicker) {
