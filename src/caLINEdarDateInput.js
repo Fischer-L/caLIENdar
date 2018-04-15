@@ -151,6 +151,15 @@ class CaLINEdarDateInput {
           this._flipDatePicker(value.year, value.month, "right");
           return;
         }
+
+        let btnValue = target.getAttribute("data-caLINEdar-value");
+        if (btnValue === "year-picker-btn") {
+          return;
+        }
+        if (btnValue === "month-picker-btn") {
+          this._showMonthPicker(value.year, value.month);
+          return;
+        }
         break;
     }
   }
@@ -160,6 +169,10 @@ class CaLINEdarDateInput {
   }
 
   // caLINEdar events end
+
+  _showMonthPicker(year, monthPicked) {
+    this.caLINEdar.showMonthPicker(this._getMonthPickerParams(year, monthPicked));
+  }
 
   _flipDatePicker(year, month, dir) {
     // TODO: utilize `dir` to do RTL
@@ -199,6 +212,19 @@ class CaLINEdarDateInput {
       value,
       pickerBtns,
       weekHeaders,
+    };
+  }
+
+  _getMonthPickerParams(year, monthPicked) {
+    let months = this._calendar.getMonths(year);
+    months = months.map(m => {
+      m.picked = m.value === monthPicked;
+      return m;
+    });
+    let value = this._serializeLocalDate({ month: monthPicked });
+    return {
+      value,
+      months
     };
   }
 

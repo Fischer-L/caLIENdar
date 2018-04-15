@@ -163,6 +163,22 @@ $caLINEdar-width: 18.75em; // 300px = 18.75em @ 1em is 16px
   color: $caLINEdar-font-color;
   vertical-align: middle;
   text-align: center;
+  table-layout: fixed;
+}
+
+.caLINEdar-month-picker > .caLINEdar-table {
+  border-spacing: 6px;
+  border-collapse: separate;
+}
+
+.caLINEdar-year-picker > .caLINEdar-table {
+  width: 80%;
+}
+
+.caLINEdar-year-picker > .caLINEdar-table,
+.caLINEdar-month-picker > .caLINEdar-table {
+  height: $caLINEdar-table-max-height - 2em;
+  margin-top: 1em;
 }
 
 .caLINEdar-table-cell {
@@ -172,6 +188,8 @@ $caLINEdar-width: 18.75em; // 300px = 18.75em @ 1em is 16px
   border: 1px solid transparent;
   border-radius: 3px;
   box-sizing: border-box;
+  overflow: hidden;
+  word-break: break-all;
 }
 
 .caLINEdar-table-cell.picked {
@@ -193,12 +211,5 @@ $caLINEdar-width: 18.75em; // 300px = 18.75em @ 1em is 16px
 .caLINEdar-table-cell.active:hover {
   border: 1px solid #efefef;
   background: #efefef;
-}
-
-.caLINEdar-year-picker > .caLINEdar-table,
-.caLINEdar-month-picker > .caLINEdar-table {
-  width: 80%;
-  height: $caLINEdar-table-max-height - 2em;
-  margin-top: 1em;
 }
 

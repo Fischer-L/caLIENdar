@@ -245,7 +245,18 @@ const caLINEdar = {
     }
   },
 
-  showMonthPicker(months) {
+  /**
+   * @param params {Object} The parameters are:
+   *    - value {String} The data attribute value identifing year
+
+   *    - months {Array} 
+   *        An array (count is `MAX_COUNT_MONTHS_IN_MONTH_PICKER`) of months to display.
+   *        Each month is an object with:
+   *        - text {String} The title of this month
+   *        - value {Integer} The data attribute value identifying this month
+   *        - picked {bool} whether this date is picked
+   */
+  showMonthPicker(params) {
     if (!this.isCalendarOpen()) {
       console.warn("Should open the calendar once first then show the month picker");
       return;
@@ -259,17 +270,25 @@ const caLINEdar = {
         rowCount: 3,
       });
       this._monthPicker.classList.add("caLINEdar-month-picker");
+      [
+        ".caLINEdar-panel__btn.left-btn",
+        ".caLINEdar-panel__btn.right-btn"
+      ].forEach(cls => {
+        this._monthPicker.querySelector(cls).style.display = "none";
+      });
       this._calendar.appendChild(this._monthPicker);
     }
     this.closeDatePicker();
     this.closeYearPicker();
     this._monthPicker.style.display = "";
-    return this._updateMonthPicker(months);
+    this._monthPicker.setAttribute("data-caLINEdar-value", params.value);
+    return this._updateMonthPicker(params.months);
   },
 
   closeMonthPicker() {
     if (this._monthPicker) {
       this._monthPicker.style.display = "none";
+      this._monthPicker.removeAttribute("data-caLINEdar-value");
     }
   },
 
@@ -310,6 +329,7 @@ const caLINEdar = {
   EVENT_PICKER_CLICK: "caLINEdar-on-picker-click",
   EVENT_CLICK_OUTSIDE_PICKER: "caLINEdar-on-click-outside",
 
+  MAX_COUNT_MONTHS_IN_MONTH_PICKER: 12,
   MAX_COUNT_DATES_IN_DATE_PICKER: 6 * 7,
 
   // Events
@@ -391,7 +411,6 @@ const caLINEdar = {
     return new Promise(resolve => {
       this._win.requestAnimationFrame(() => {
         let picker = this._monthPicker;
-
         let btn = picker.querySelector(".caLINEdar-panel__btn.picker-btn");
         btn.textContent = months.find(m => m.picked).text;
 
