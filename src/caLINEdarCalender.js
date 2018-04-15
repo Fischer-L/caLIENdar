@@ -17,23 +17,43 @@ class CaLINEdarCalender {
   }
 
   /**
+   * @return {String}
+   *    The date string placeholder to let outside use as placeholder in,
+   *    say, a input element. For exmpale, `"YYYY/MM/DD"`
+   */
+  getDateStringPlaceholder() {
+    throw new Error("getDateStringPlaceholder not implemented");
+  }
+
+  /**
    * @param year {integer} Optional. the year value per this calendar
    * @param month {Integer} Optional. the month value per this calendar
    * @param date {Integer} Optional. the date value per this calendar
-   *                       Only useful when `month` is given too.
-   * @param params {Object} Optional. Should provide the below options:
-   *    - fallbackToPlaceholder {bool} Optional. If failed at formatting,
-   *      should return the placeholder for "YYYY", "MM", "DD",
-   *      such as `["YYYY", "MM", "DD", "/"]`, so at least users can have a fallback to follow.
    *
    * @return {Array} 
-   *    For example There is a JS Date-based calendar and a date as `new Date(2018, 3, 10)`.
-   *    Calling `formatDateString(2018, 3, 10)` would return `[ "2018", "Apr", "10", "/" ]`,
-   *    which means this calendar prefers a date string format as "2018/Apr/10".
-   *    The main purpose of this method is to let users know the prefered format and order
-   *    of the date string of this calendar. If unable to format, `null`
+   *    For example There is a JS Date-based calendar and a date as `new Date(2018, 3, 9)`.
+   *    Calling `formatDateString(2018, 3, 9)` would return an object as
+   *    ```
+   *    {
+   *      year: {
+   *        pos: 2,
+   *        text: "2018"
+   *      },
+   *      month: {
+   *        pos: 0,
+   *        text: "Apr"
+   *      },
+   *      date: {
+   *        pos: 1,
+   *        text: "09"
+   *      },
+   *      delimiter: "/"
+   *    }
+   *    ```
+   *    which means this calendar prefers a date string format as "Apr/10/2018".
+   *    If unable to format, `null`.
    */
-  formatDateString(year, month, date, params) {
+  formatDateString(year, month, date) {
     throw new Error("formatDateString not implemented");
   }
 

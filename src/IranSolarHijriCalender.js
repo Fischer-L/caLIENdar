@@ -223,37 +223,46 @@ function createIranSolarHijriCalender(caLINEdar) {
       return true;
     }
 
+    getDateStringPlaceholder() {
+      return "DD/MM/YYYY"; 
+    }
+
     formatDateString(year, month, date, params = {}) {
+      let formats = [];
+
       let y = IRAN_YEAR_MAP[year];
       if (y) {
-        y = "" + y.value;
+        formats.push({
+          pos: 2,
+          text: "" + y.value
+        });
       }
 
       let m = IRAN_MONTH_MAP.get(month)
       if (m) {
-        m = m.text;
+        formats.push({
+          pos: 1,
+          text: "" + m.text
+        });
       }
 
       let d = date;
       if (caLINEdar.isInt(d)) {
-        d = d < 10 ? "0" + d : "" + d;
+        formats.push({
+          pos: 0,
+          text: d < 10 ? "0" + d : "" + d
+        });
       }
 
-      let format = null;
-      if (y && m && d) {
-        format = [d, m, y];
-      } else if (y && m) {
-        format = [m, y];
-      } else if (m && d) {
-        format = [d, m];
+      if (formats.length) {
+        return {
+          year: formats.pop(),
+          month: formats.pop(),
+          date: formats.pop(),
+          delimiter: "/"
+        };
       }
-      if (!format && params.fallbackToPlaceholder) {
-        format = ["DD", "MM", "YYYY"];
-      }
-      if (format) {
-        format.push("/");
-      }
-      return format;
+      return null;
     }
 
     toLocaleDateString(jsDate) {
@@ -264,13 +273,17 @@ function createIranSolarHijriCalender(caLINEdar) {
         jsDate.getDate()
       );
       if (d) {
-        str = this.formatDateString(
+        let format = this.formatDateString(
           d.year,
           d.month,
           d.date
         );
-        let token = str && str.pop();
-        str = token && str.join(token);
+        str = [0,0,0];
+        let { year, month, date } = format;
+        str[year.pos] = year.text;
+        str[month.pos] = month.text;
+        str[date.pos] = date.text;
+        str = str.join(format.delimiter);
       }
       return str || "";
     }

@@ -83,31 +83,40 @@ describe("IranSolarHijriCalender", () => {
     const dateFormats = [
       {
         date: [1354, 0, 1],
-        expected: "01/Farvardin/1354",
+        expected: { 
+          year: { pos: 0, text: '01' },
+          month: { pos: 1, text: 'Farvardin' },
+          date: { pos: 2, text: '1354' },
+          delimiter: '/' 
+        },
       },
       {
         date: [1354, 0, null],
-        expected: "Farvardin/1354",
+        expected: { 
+          year: { pos: 1, text: 'Farvardin' },
+          month: { pos: 2, text: '1354' },
+          date: undefined,
+          delimiter: '/' 
+        },
       },
       {
         date: [null, 0, 1],
-        expected: "01/Farvardin",
+        expected: {
+          year: { pos: 0, text: '01' },
+          month: { pos: 1, text: 'Farvardin' },
+          date: undefined,
+          delimiter: '/' 
+        },
       },
     ];
     dateFormats.forEach(d => {
-      let dateString = iranCalendar.formatDateString(...d.date);
-      let token = dateString.pop();
-      expect(dateString.join(token)).toBe(d.expected);
+      let format = iranCalendar.formatDateString(...d.date);
+      expect(JSON.stringify(format)).toBe(JSON.stringify(d.expected));
     });
   });
 
-  it("should provide date strings format placeholder", () => {
-    let dateString = iranCalendar.formatDateString(
-      null, null, null, {
-      fallbackToPlaceholder : true
-    });
-    let token = dateString.pop();
-    expect(dateString.join(token)).toBe("DD/MM/YYYY");
+  it("should provide date strings placeholder", () => {
+    expect(iranCalendar.getDateStringPlaceholder()).toBe("DD/MM/YYYY");
   });
 
   it("should format a js Date to a locale date string", () => {

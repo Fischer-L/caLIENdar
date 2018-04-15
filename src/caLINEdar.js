@@ -156,11 +156,11 @@ const caLINEdar = {
    * Open the calendar. Always open the date picker first.
    *
    * @param anchorInput {HTMLInputElement} the input at which the calendar is anchor
-   * @param pickerBtns, weekHeaders, dates {*} See `showDatePicker`
+   * @param params {*} See `showDatePicker`
    *
    * @return {Promise} A promise
    */
-  async openCalendar(anchorInput, pickerBtns, weekHeaders, dates) {
+  async openCalendar(anchorInput, params) {
     if (!this._calendar) {
       console.warn("Please call `init` first then manipuate the calendar");
       return;
@@ -171,7 +171,7 @@ const caLINEdar = {
     // This is to avoid a *flash* during positioning.
     this._calendar.style.visibility = "hidden";
     this._calendar.setAttribute("data-caLINEdar-opened", true);
-    await this.showDatePicker(pickerBtns, weekHeaders, dates);
+    await this.showDatePicker(params);
     // Let's always position the calendar after our picker is populated
     // so as to make sure the correct dimension is layouted when positioning. 
     await this.positionCalendar(this._win, anchorInput);
@@ -190,24 +190,28 @@ const caLINEdar = {
   /**
    * Must always call `openCalendar` first to have the calendar opened.
    *
-   * @param pickerBtns {Array} represent the buttons on the top of the picker.
-   *                            Each button should contains
-   *                            - text {String} the button title
-   *                            - value {String} the data attribute value for this button,
-   *                              which will be used to identify this button when clicking.
+   * @param params {Object} The parameters are:
+   *    - value {String} The data attribute value identifing year and month
    *
-   * @param weekHeaders {Array} The titles of days in a week (count is 7).
-   *                             The 1st one is displayed in the left-most.
+   *    - pickerBtns {Array} represent the buttons on the top of the picker.
+   *                         Each button should contains
+   *                         - text {String} the button title
+   *                         - value {String} the data attribute value for this button,
+   *                           which will be used to identify this button when clicking.
    *
-   * @param dates {Array} 
-   *    An array (count is `MAX_COUNT_DATES_IN_DATE_PICKER`) of dates to display. Each date is an object with
-   *    - text {String} The title of this date
-   *    - value {Integer} The data attribute value identifying this date
-   *    - picked {bool} whether this date is picked
-   *    - special {bool} whether this date should be highlighted as special
-   *    - grayOut {bool} whether this date should be gray out (Win over `special`)
+   *    - weekHeaders {Array} The titles of days in a week (count is 7).
+   *                          The 1st one is displayed in the left-most.
+   *
+   *    - dates {Array} 
+   *        An array (count is `MAX_COUNT_DATES_IN_DATE_PICKER`) of dates to display.
+   *         Each date is an object with:
+   *        - text {String} The title of this date
+   *        - value {Integer} The data attribute value identifying this date
+   *        - picked {bool} whether this date is picked
+   *        - special {bool} whether this date should be highlighted as special
+   *        - grayOut {bool} whether this date should be gray out (Win over `special`)
    */
-  showDatePicker(pickerBtns, weekHeaders, dates) {
+  showDatePicker(params) {
     if (!this.isCalendarOpen()) {
       console.warn("Should open the calendar once first then show the date picker");
       return;
@@ -227,7 +231,8 @@ const caLINEdar = {
     this.closeYearPicker();
     this.closeMonthPicker();
     this._datePicker.style.display = "";
-    return this._updateDatePicker(pickerBtns, weekHeaders, dates);
+    this._datePicker.setAttribute("data-caLINEdar-value", params.value);
+    return this._updateDatePicker(params.pickerBtns, params.weekHeaders, params.dates);
   },
 
   /**
@@ -236,6 +241,7 @@ const caLINEdar = {
   closeDatePicker() {
     if (this._datePicker) {
       this._datePicker.style.display = "none";
+      this._datePicker.removeAttribute("data-caLINEdar-value");
     }
   },
 

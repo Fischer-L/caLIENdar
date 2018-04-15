@@ -80,38 +80,47 @@ class CaLINEdarDateInput {
   clearDate() {
     this._date =
     this._dateLocal = null;
-    let dateString = iranCalendar.formatDateString(
-      null, null, null, {
-      fallbackToPlaceholder : true
+    this.input.value = this._calendar.getDateStringPlaceholder();
+  }
+
+  _getDatePickerParams() {
+    let calendar = this._calendar;
+    let datePicked = this._dateLocal;;
+    let dateLocal = datePicked || calendar.getNow({ fallback: "last-date" });
+
+    let format = calendar.formatDateString(dateLocal.year, dateLocal.month);
+    let pickerBtns = [];
+    pickerBtns.push({
+      text: format.year.text,
+      value: "year-picker-btn",
     });
-    let token = dateString.pop();
-    this.input.value = dateString.join(token);
+    pickerBtns.push({
+      text: format.month.text,
+      value: "month-picker-btn",
+    });
+    if (format.year.pos > format.month.pos) {
+      pickerBtns.reverse();
+    }
+
+    let days = calendar.getDays();
+    let weekHeaders = days.map(d => d.text);
+
+    let dates = this._getLocalDatesToDisplay(dateLocal.year, dateLocal.month, datePicked);
+    
+    let value = [ dateLocal.year, dateLocal.month, dateLocal.date ].join("-");
+    return {
+      dates,
+      value,
+      pickerBtns,
+      weekHeaders,
+    };
   }
 
   /**
    * Open the calendar to let user pick a date
    */
   openCalendar() {
-    let calendar = this._calendar;
-    let datePicked = this._dateLocal;;
-    let dateLocal = datePicked || calendar.getNow({ fallback: "last-date" });
-
-    let dateString = calendar.formatDateString(dateLocal.year, dateLocal.month);
-    let pickerBtns = [
-      {
-        text: dateString[0],
-        value: "date-picker-btn-0",
-      },
-      {
-        text: dateString[1],
-        value: "date-picker-btn-1",
-      }
-    ];
-    
-    let days = calendar.getDays();
-    let weekHeaders = days.map(d => d.text);
-    let dates = this._getLocalDatesToDisplay(dateLocal.year, dateLocal.month, datePicked);
-    this.caLINEdar.openCalendar(this.input, pickerBtns, weekHeaders, dates);
+    this.caLINEdar.openCalendar(this.input, this._getDatePickerParams());
   }
 
   // Public APIs end
@@ -160,7 +169,11 @@ class CaLINEdarDateInput {
   }
 
   _onPanelButtonClick(pickerId, target) {
-    // TODO
+    switch (pickerId) {
+      case this.caLINEdar.ID_DATE_PICKER:
+
+        break;
+    }
   }
 
   _onPick(pickerId, target) {
