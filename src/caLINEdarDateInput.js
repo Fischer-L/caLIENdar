@@ -71,56 +71,26 @@ class CaLINEdarDateInput {
       return false;
     }
 
-    this._date = newDate;
-    this._dateLocal = local;
-    this.input.value = calendar.toLocaleDateString(this._date);
+    this._jsDate = newDate;
+    this._localDate = local;
+    this.input.value = calendar.toLocaleDateString(this._jsDate);
     return true;
   }
 
   clearDate() {
-    this._date =
-    this._dateLocal = null;
+    this._jsDate =
+    this._localDate = null;
     this.input.value = this._calendar.getDateStringPlaceholder();
-  }
-
-  _getDatePickerParams() {
-    let calendar = this._calendar;
-    let datePicked = this._dateLocal;;
-    let dateLocal = datePicked || calendar.getNow({ fallback: "last-date" });
-
-    let format = calendar.formatDateString(dateLocal.year, dateLocal.month);
-    let pickerBtns = [];
-    pickerBtns.push({
-      text: format.year.text,
-      value: "year-picker-btn",
-    });
-    pickerBtns.push({
-      text: format.month.text,
-      value: "month-picker-btn",
-    });
-    if (format.year.pos > format.month.pos) {
-      pickerBtns.reverse();
-    }
-
-    let days = calendar.getDays();
-    let weekHeaders = days.map(d => d.text);
-
-    let dates = this._getLocalDatesToDisplay(dateLocal.year, dateLocal.month, datePicked);
-    
-    let value = [ dateLocal.year, dateLocal.month, dateLocal.date ].join("-");
-    return {
-      dates,
-      value,
-      pickerBtns,
-      weekHeaders,
-    };
   }
 
   /**
    * Open the calendar to let user pick a date
    */
   openCalendar() {
-    this.caLINEdar.openCalendar(this.input, this._getDatePickerParams());
+    let datePicked = this._localDate;
+    let dateLocal = datePicked || this._calendar.getNow({ fallback: "last-date" });
+    let params = this._getDatePickerParams(dateLocal.year, dateLocal.month, datePicked);
+    this.caLINEdar.openCalendar(this.input, params);
   }
 
   // Public APIs end
@@ -155,23 +125,34 @@ class CaLINEdarDateInput {
     // which will cause the calendar closed.
     await this._ensureFocus();
 
-    let { pickerId, target } = e.detail;
+    let { picker, target } = e.detail;
 
     let cls = target.classList;
     if (cls.contains("caLINEdar-panel__btn")) {
-      this._onPanelButtonClick(pickerId, target);
+      this._onPanelButtonClick(picker, target);
     } else if (
       cls.contains("caLINEdar-table-cell") &&
       target.tagName.toLowerCase() === "td"
     ) {
-      this._onPick(pickerId, target);
+      this._onPick(picker, target);
     }
   }
 
-  _onPanelButtonClick(pickerId, target) {
-    switch (pickerId) {
+  _onPanelButtonClick(picker, target) {
+    let pickerValue = picker.getAttribute("data-caLINEdar-value");
+    switch (picker.id) {
       case this.caLINEdar.ID_DATE_PICKER:
-
+        pickerValue = pickerValue.split("-");
+        let y = parseInt(pickerValue[0]);
+        let m = parseInt(pickerValue[1]);
+        if (target.classList.contains("left-btn")) {
+          this._flipDatePicker(y, m, "left");
+          return;
+        }
+        if (target.classList.contains("right-btn")) {
+          this._flipDatePicker(y, m, "right");
+          return;
+        }
         break;
     }
   }
@@ -181,6 +162,47 @@ class CaLINEdarDateInput {
   }
 
   // caLINEdar events end
+
+  _flipDatePicker(year, month, dir) {
+    // TODO: utilize `dir` to do RTL
+    let months = this._calendar.getMonths(year);
+    let next = dir === "right";
+    let target = next ? 
+      this._calcNextLocalMonth(year, month, months) :
+      this._calcPrevLocalMonth(year, month, months);
+    let params = this._getDatePickerParams(target.year, target.month, this._localDate);
+    this.caLINEdar.showDatePicker(params);
+  }
+
+  _getDatePickerParams(year, month, datePicked) {
+    let calendar = this._calendar;
+    let format = calendar.formatDateString(year, month);
+    let pickerBtns = [];
+    pickerBtns.push({
+      text: format.year.text,
+      value: "year-picker-btn",
+    });
+    pickerBtns.push({
+      text: format.month.text,
+      value: "month-picker-btn",
+    });
+    if (format.year.pos > format.month.pos) {
+      pickerBtns.reverse();
+    }
+
+    let days = calendar.getDays();
+    let weekHeaders = days.map(d => d.text);
+
+    let dates = this._getLocalDatesToDisplay(year, month, datePicked);
+    
+    let value = [ year, month ].join("-");
+    return {
+      dates,
+      value,
+      pickerBtns,
+      weekHeaders,
+    };
+  }
 
   async _ensureFocus() {
     let refocus = () => {
@@ -225,30 +247,54 @@ class CaLINEdarDateInput {
     }
   }
 
+  _calcPrevLocalMonth(year, month, months) {
+    let currMonthIdx = months.findIndex(m => m.value === month);
+    let prevYear = year;
+    let prevMonth = -1;
+    if (currMonthIdx === 0) {
+      // OK the previous month is the last month in the last year
+      prevYear -= 1;
+      prevMonth = months[months.length - 1].value;
+    } else {
+      prevMonth = months[currMonthIdx - 1].value;
+    }
+    return {
+      year: prevYear,
+      month: prevMonth
+    };
+  }
+
+  _calcNextLocalMonth(year, month, months) {
+    let currMonthIdx = months.findIndex(m => m.value === month);
+    let nextYear = year;
+    let nextMonth = -1;
+    if (currMonthIdx === months.length - 1) {
+      // OK the next month is the 1st month in the next year
+      nextYear += 1;
+      nextMonth = months[0].value;
+    } else {
+      nextMonth = months[currMonthIdx + 1].value;
+    }
+    return {
+      year: nextYear,
+      month: nextMonth
+    };
+  }
+
   _getLocalDatesToDisplay(year, month, datePicked) {
     let calendar = this._calendar;
     let days = calendar.getDays();
     let months = calendar.getMonths(year);
     let dates = calendar.getDates(year, month);
-
-    let currMonthIdx = months.findIndex(m => m.value === month);
-    let firstDayIdx = days.findIndex(d => d.value === dates[0].day);
-
+  
     // For example maybe the 1st date is on Wed.
     // Then we are having 3 empty dates in the start
+    let firstDayIdx = days.findIndex(d => d.value === dates[0].day);
     let emptyCountInStart = firstDayIdx;
     let prevDates = null;
     if (emptyCountInStart > 0) {
-      let prevYear = year;
-      let prevMonth = -1;
-      if (currMonthIdx === 0) {
-        // OK the previous month is the last month in the last year
-        prevYear -= 1;
-        prevMonth = months[months.length - 1].value;
-      } else {
-        prevMonth = months[currMonthIdx - 1].value;
-      }
-      prevDates = calendar.getDates(prevYear, prevMonth);
+      let prev = this._calcPrevLocalMonth(year, month, months);
+      prevDates = calendar.getDates(prev.year, prev.month);
     }
     if (prevDates) {
       for (let i = prevDates.length - 1; emptyCountInStart > 0;) {
@@ -263,16 +309,8 @@ class CaLINEdarDateInput {
     let emptyCountInTail = this.caLINEdar.MAX_COUNT_DATES_IN_DATE_PICKER - dates.length;
     let nextDates = null;
     if (emptyCountInTail > 0) {
-      let nextYear = year;
-      let nextMonth = -1;
-      if (currMonthIdx === months.length - 1) {
-        // OK the next month is the 1st month in the next year
-        nextYear += 1;
-        nextMonth = months[0].value;
-      } else {
-        nextMonth = months[currMonthIdx + 1].value;
-      }
-      nextDates = calendar.getDates(nextYear, nextMonth);
+      let next = this._calcNextLocalMonth(year, month, months);
+      nextDates = calendar.getDates(next.year, next.month);
     }
     if (nextDates) {
       for (let i = 0; emptyCountInTail > 0;) {

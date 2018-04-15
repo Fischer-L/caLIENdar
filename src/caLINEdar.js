@@ -341,8 +341,8 @@ const caLINEdar = {
       e.preventDefault();
       e.stopPropagation();
       this._notifyDateInput(this.EVENT_PICKER_CLICK, {
+        picker: picker,
         target: e.target,
-        pickerId: picker.id,
       });
     } else {
       this._notifyDateInput(this.EVENT_CLICK_OUTSIDE_PICKER);
@@ -539,24 +539,24 @@ const caLINEdar = {
       let data = valuesByRows[i] || null;
       let cells = row.querySelectorAll(".caLINEdar-table-cell");
       for (let j = 0; j < cellCount; ++j) {
+        let cell = cells[j];
+        cell.classList.remove("picked");
+        cell.classList.remove("active");
+        cell.classList.remove("special");
+        cell.classList.remove("gray-out-date");
         if (data && data[j]) {
-          cells[j].textContent = data[j].text; 
-          cells[j].setAttribute("data-caLINEdar-value", data[j].value);
-          cells[j].classList.add("active");
+          cell.textContent = data[j].text; 
+          cell.setAttribute("data-caLINEdar-value", data[j].value);
+          cell.classList.add("active");
           if (data[j].picked) {
-            cells[j].classList.add("picked");
+            cell.classList.add("picked");
           }
           if (data[j].special) {
-            cells[j].classList.add("special");
+            cell.classList.add("special");
           }
           if (data[j].grayOut) {
-            cells[j].classList.add("gray-out-date");
+            cell.classList.add("gray-out-date");
           }
-        } else {
-          cells[j].classList.remove("picked");
-          cells[j].classList.remove("active");
-          cells[j].classList.remove("special");
-          cells[j].classList.remove("gray-out-date");
         }
       }
     }
