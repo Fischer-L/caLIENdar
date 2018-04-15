@@ -119,9 +119,15 @@ class CaLINEdarDateInput {
   // DOM events
 
   onFocus = e => {
-    this.caLINEdar.setCurrentDateInput(this);
-    // Open in the next tick. Don't block the event.
-    this._win.requestAnimationFrame(() => this.openCalendar());
+    if (this.caLINEdar.getCurrentDateInput() !== this) {
+      this.caLINEdar.setCurrentDateInput(this);
+      // Open in the next tick. Don't block the event.
+      this._win.requestAnimationFrame(() => this.openCalendar());
+    } else {
+      if (!this.caLINEdar.isCalendarOpen()) {
+        this._win.requestAnimationFrame(() => this.openCalendar());
+      }
+    }
   }
 
   // DOM events end
@@ -165,26 +171,24 @@ class CaLINEdarDateInput {
 
   async _ensureFocus() {
     let refocus = () => {
-      let restoreFocus = () => {
-        this.input.removeEventListener("focus", restoreFocus);
-        this.input.addEventListener("focus", this.onFocus);
-      };
-      this.input.addEventListener("focus", restoreFocus);
-      this.input.removeEventListener("focus", this.onFocus);
-      this.input.focus();
+      this._win.requestAnimationFrame(() => this.input.focus());
     };
 
     if (this._win.document.activeElement === this.input) {
+      // The case that we are about to lose focus so stop it.
       let stopBlur = () => {
         this.input.removeEventListener("blur", stopBlur);
-        this._win.requestAnimationFrame(refocus);
+        refocus();
       };
       this.input.addEventListener("blur", stopBlur);
     } else {
-      refocus();
+      // The case that we lose focus but we shouldn't.
       if (!this.caLINEdar.isCalendarOpen()) {
+        // The calendar shouldn't be closed 
+        // so restore the calendar asap.
         await this.openCalendar();
       }
+      refocus();
     }
   }
 

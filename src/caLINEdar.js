@@ -55,6 +55,13 @@ const caLINEdar = {
     this._dateInput = dateInput;
   },
 
+  /**
+   * @return {CaLINEdarDateInput} The current date input associated. `null` if none.
+   */
+  getCurrentDateInput() {
+    return this._dateInput || null;
+  },
+
   isLeapYear(year) {
     return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
   },
