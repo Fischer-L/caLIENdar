@@ -5,10 +5,20 @@ const caLINEdar = {
   CaLINEdarCalender,
   CaLINEdarDateInput,
 
-  init(window) {
-    this._win = window;
-    this._doc = window.document;
+  ID_DATE_PICKER: "caLINEdar-date-picker",
+  ID_MONTH_PICKER: "caLINEdar-month-picker",
+  ID_YEAR_PICKER: "caLINEdar-year-picker",
+
+  EVENT_PICKER_CLICK: "caLINEdar-on-picker-click",
+  EVENT_CLICK_OUTSIDE_PICKER: "caLINEdar-on-click-outside",
+
+  init(win) {
+    this._win = win;
+    this._doc = win.document;
     this._createCalendarHolder();
+
+    win.addEventListener("click", e => this._onClick(e));
+    win.addEventListener("touchend", e => this._onClick(e));
   },
 
   // Date-picking methods
@@ -246,17 +256,27 @@ const caLINEdar = {
     }
   },
 
-  _createEmptyPicker(options = {}) {
-    let rowCount = options.rowCount || 0;
-    let cellCount = options.cellCount || 0;
-    let headerCount = options.headerCount || 0;
-    let pickerBtnCount = options.pickerBtnCount || 0;
-    if (cellCount <= 0 || rowCount <= 0 || 
+  /**
+   * A picker looks like below:
+   * <div class="caLINEdar-picker">
+   *    <div class="caLINEdar-panel">
+   *    <table class="caLINEdar-table">
+   * </div>
+   */
+  _createEmptyPicker(params = {}) {
+    let id = params.id;
+    let rowCount = params.rowCount || 0;
+    let cellCount = params.cellCount || 0;
+    let headerCount = params.headerCount || 0;
+    let pickerBtnCount = params.pickerBtnCount || 0;
+    if (!id || cellCount <= 0 || rowCount <= 0 || 
         headerCount < 0 || pickerBtnCount < 0) {
       return null;
     }
 
     let picker = this._doc.createElement("div");
+    picker.classList.add("caLINEdar-picker");
+    picker.id = id;
 
     let panel = this._createPanel();
     let btns = panel.querySelectorAll(".caLINEdar-panel__btn.picker-btn");
@@ -274,6 +294,53 @@ const caLINEdar = {
     picker.appendChild(table);
 
     return picker;
+  },
+
+  _onClick(e) {
+    if (!this._dateInput || !this.isCalendarOpen() ) {
+      // If the calendar was closed or no date input,
+      // nowhere has to do with us.
+      return;
+    }
+
+    if (e.target === this._dateInput.input) {
+      // User is clicking on the input.
+      // Has nothing to do with here too.
+      return;
+    }
+
+    let picker = null;
+    let node = e.target;
+    while (node && !picker) {
+      if (node.classList && node.classList.contains("caLINEdar-picker")) {
+        picker = node;
+      } else {
+        node = node.parentNode;
+      }
+    }
+
+    if (picker) {
+      e.preventDefault();
+      e.stopPropagation();
+      this._notifyDateInput(this.EVENT_PICKER_CLICK, {
+        target: e.target,
+        pickerId: picker.id,
+      });
+    } else {
+      this._notifyDateInput(this.EVENT_CLICK_OUTSIDE_PICKER);
+    }
+  },
+
+  _notifyDateInput(eventType, detail) {
+    if (this._dateInput) {
+      // Why a custom event here?
+      // Because we want to keep event communications
+      // between caLINEdar and date input in private.
+      // With the custom event, date input can listen to events 
+      // without exposing any public APIs.
+      let evt = new CustomEvent(eventType, { detail });
+      this._dateInput.input.dispatchEvent(evt);
+    }
   },
 
   _createCalendarHolder() {
@@ -385,6 +452,7 @@ const caLINEdar = {
     if (!this._datePicker) {
       // Yes we do the lazy creation for all the date, month, year pickers.
       this._datePicker = this._createEmptyPicker({
+        id: this.ID_DATE_PICKER,
         pickerBtnCount: 2,
         headerCount: 7,
         cellCount: 7,
@@ -458,6 +526,7 @@ const caLINEdar = {
     }
     if (!this._monthPicker) {
       this._monthPicker = this._createEmptyPicker({
+        id: this.ID_MONTH_PICKER,
         pickerBtnCount: 1,
         headerCount: 0,
         cellCount: 4,
@@ -499,6 +568,7 @@ const caLINEdar = {
     }
     if (!this._yearPicker) {
       this._yearPicker = this._createEmptyPicker({
+        id: this.ID_YEAR_PICKER,
         pickerBtnCount: 1,
         headerCount: 0,
         cellCount: 3,

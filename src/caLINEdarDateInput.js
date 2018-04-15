@@ -33,7 +33,8 @@ class CaLINEdarDateInput {
     }
 
     input.addEventListener("focus", this.onFocus);
-    input.addEventListener("blur", this.onBlur);
+    input.addEventListener(caLINEdar.EVENT_PICKER_CLICK, this._onPickerClick);
+    input.addEventListener(caLINEdar.EVENT_CLICK_OUTSIDE_PICKER, this._onClickOutside);
   }
 
   /**
@@ -123,11 +124,69 @@ class CaLINEdarDateInput {
     this._win.requestAnimationFrame(() => this.openCalendar());
   }
 
-  onBlur = e => {
+  // DOM events end
+
+  // caLINEdar events
+
+  _onClickOutside = e => {
     this.caLINEdar.closeCalendar();
   }
+  
+  _onPickerClick = async e => {
+    e.preventDefault();
+    e.stopPropagation();
 
-  // DOM events end
+    // When clicking outside the input, it will lose focus,
+    // which will cause the calendar closed.
+    await this._ensureFocus();
+
+    let { pickerId, target } = e.detail;
+
+    let cls = target.classList;
+    if (cls.contains("caLINEdar-panel__btn")) {
+      this._onPanelButtonClick(pickerId, target);
+    } else if (
+      cls.contains("caLINEdar-table-cell") &&
+      target.tagName.toLowerCase() === "td"
+    ) {
+      this._onPick(pickerId, target);
+    }
+  }
+
+  _onPanelButtonClick(pickerId, target) {
+    // TODO
+  }
+
+  _onPick(pickerId, target) {
+    // TODO
+  }
+
+  // caLINEdar events end
+
+  async _ensureFocus() {
+    let refocus = () => {
+      let restoreFocus = () => {
+        this.input.removeEventListener("focus", restoreFocus);
+        this.input.addEventListener("focus", this.onFocus);
+      };
+      this.input.addEventListener("focus", restoreFocus);
+      this.input.removeEventListener("focus", this.onFocus);
+      this.input.focus();
+    };
+
+    if (this._win.document.activeElement === this.input) {
+      let stopBlur = () => {
+        this.input.removeEventListener("blur", stopBlur);
+        this._win.requestAnimationFrame(refocus);
+      };
+      this.input.addEventListener("blur", stopBlur);
+    } else {
+      refocus();
+      if (!this.caLINEdar.isCalendarOpen()) {
+        await this.openCalendar();
+      }
+    }
+  }
 
   _datesEqual(a, b) {
     return a && b && 
