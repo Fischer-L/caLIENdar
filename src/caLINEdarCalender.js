@@ -21,16 +21,31 @@ class CaLINEdarCalender {
    * @param month {Integer} Optional. the month value per this calendar
    * @param date {Integer} Optional. the date value per this calendar
    *                       Only useful when `month` is given too.
+   * @param params {Object} Optional. Should provide the below options:
+   *    - fallbackToPlaceholder {bool} Optional. If failed at formatting,
+   *      should return the placeholder for "YYYY", "MM", "DD",
+   *      such as `["YYYY", "MM", "DD", "/"]`, so at least users can have a fallback to follow.
    *
    * @return {Array} 
-   *    Take a calendar based on JS Date for example.
-   *    There is a date as `new Date(2018, 3, 10)`.
-   *    Calling `formatDateString(2018, 3, 10)` will return `[ "2018", "Apr", "10", "/" ]`,
+   *    For example There is a JS Date-based calendar and a date as `new Date(2018, 3, 10)`.
+   *    Calling `formatDateString(2018, 3, 10)` would return `[ "2018", "Apr", "10", "/" ]`,
    *    which means this calendar prefers a date string format as "2018/Apr/10".
-   *    If unable to format, `null`
+   *    The main purpose of this method is to let users know the prefered format and order
+   *    of the date string of this calendar. If unable to format, `null`
    */
-  formatDateString(year, month, date) {
+  formatDateString(year, month, date, params) {
     throw new Error("formatDateString not implemented");
+  }
+
+  /**
+   * @param jsDate {Date} a JS Date object
+   *
+   * @return {String}
+   *    The date string formated into this calendar's locale.
+   *    `""` if unable to format one.
+   */
+  toLocaleDateString(jsDate) {
+    throw new Error("toLocaleDateString not implemented");
   }
 
   /**

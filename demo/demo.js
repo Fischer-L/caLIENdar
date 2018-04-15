@@ -73,6 +73,7 @@ caLINEdar.init(window);
 let iranDatePicker = document.querySelector("#iranian-date-picker");
 window.iranCalendar = createIranSolarHijriCalender(caLINEdar);
 window.iranDateInput = caLINEdar.createDateInput({
+  date: new Date(),
   mountElem: iranDatePicker,
   calendar: window.iranCalendar,
 });

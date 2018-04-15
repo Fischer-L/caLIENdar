@@ -3,7 +3,7 @@ import caLINEdar from "../src/caLINEdar";
 import createIranSolarHijriCalender from "../src/IranSolarHijriCalender";
 
 describe("IranSolarHijriCalender", () => {
-  
+
   const iranCalendar = createIranSolarHijriCalender(caLINEdar);
 
   const dates = [
@@ -79,7 +79,8 @@ describe("IranSolarHijriCalender", () => {
   });
 
   it("should format date strings", () => {
-    const data = [
+
+    const dateFormats = [
       {
         date: [1354, 0, 1],
         expected: "01/Farvardin/1354",
@@ -93,11 +94,26 @@ describe("IranSolarHijriCalender", () => {
         expected: "01/Farvardin",
       },
     ];
-    data.forEach(d => {
+    dateFormats.forEach(d => {
       let dateString = iranCalendar.formatDateString(...d.date);
       let token = dateString.pop();
       expect(dateString.join(token)).toBe(d.expected);
     });
+  });
+
+  it("should provide date strings format placeholder", () => {
+    let dateString = iranCalendar.formatDateString(
+      null, null, null, {
+      fallbackToPlaceholder : true
+    });
+    let token = dateString.pop();
+    expect(dateString.join(token)).toBe("DD/MM/YYYY");
+  });
+
+  it("should format a js Date to a locale date string", () => {
+    let d = new Date(1975, 2, 21);
+    let str = iranCalendar.toLocaleDateString(d);
+    expect(str).toBe("01/Farvardin/1354");
   });
 
   it("should return months supported", () => {

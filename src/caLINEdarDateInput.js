@@ -28,7 +28,9 @@ class CaLINEdarDateInput {
     this._win = params.window;
     this._calendar = calendar;
 
-    this.setDate(date);
+    if (!this.setDate(date)) {
+      this.clearDate();
+    }
 
     input.addEventListener("focus", this.onFocus);
   }
@@ -69,12 +71,19 @@ class CaLINEdarDateInput {
 
     this._date = newDate;
     this._dateLocal = local;
+    this.input.value = calendar.toLocaleDateString(this._date);
+    return true;
+  }
 
-    let dateString = calendar.formatDateString(local.year, local.month, local.date);
+  clearDate() {
+    this._date =
+    this._dateLocal = null;
+    let dateString = iranCalendar.formatDateString(
+      null, null, null, {
+      fallbackToPlaceholder : true
+    });
     let token = dateString.pop();
     this.input.value = dateString.join(token);
-
-    return true;
   }
 
   /**

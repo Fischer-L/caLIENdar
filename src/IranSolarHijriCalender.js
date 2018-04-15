@@ -223,7 +223,7 @@ function createIranSolarHijriCalender(caLINEdar) {
       return true;
     }
 
-    formatDateString(year, month, date) {
+    formatDateString(year, month, date, params = {}) {
       let y = IRAN_YEAR_MAP[year];
       if (y) {
         y = "" + y.value;
@@ -247,10 +247,32 @@ function createIranSolarHijriCalender(caLINEdar) {
       } else if (m && d) {
         format = [d, m];
       }
+      if (!format && params.fallbackToPlaceholder) {
+        format = ["DD", "MM", "YYYY"];
+      }
       if (format) {
         format.push("/");
       }
       return format;
+    }
+
+    toLocaleDateString(jsDate) {
+      let str = null;
+      let d = this.convertJSDate2LocalDate(
+        jsDate.getFullYear(),
+        jsDate.getMonth(),
+        jsDate.getDate()
+      );
+      if (d) {
+        str = this.formatDateString(
+          d.year,
+          d.month,
+          d.date
+        );
+        let token = str && str.pop();
+        str = token && str.join(token);
+      }
+      return str || "";
     }
 
     getNow(options = {}) {
