@@ -84,27 +84,25 @@ describe("IranSolarHijriCalender", () => {
       {
         date: [1354, 0, 1],
         expected: { 
-          year: { pos: 0, text: '01' },
+          year: { pos: 2, text: '1354' },
           month: { pos: 1, text: 'Farvardin' },
-          date: { pos: 2, text: '1354' },
+          date: { pos: 0, text: '01' },
           delimiter: '/' 
         },
       },
       {
         date: [1354, 0, null],
         expected: { 
-          year: { pos: 1, text: 'Farvardin' },
-          month: { pos: 2, text: '1354' },
-          date: undefined,
+          year: { pos: 1, text: '1354' },
+          month: { pos: 0, text: 'Farvardin' },
           delimiter: '/' 
         },
       },
       {
         date: [null, 0, 1],
         expected: {
-          year: { pos: 0, text: '01' },
           month: { pos: 1, text: 'Farvardin' },
-          date: undefined,
+          date: { pos: 0, text: '01' },
           delimiter: '/' 
         },
       },

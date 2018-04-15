@@ -228,41 +228,64 @@ function createIranSolarHijriCalender(caLINEdar) {
     }
 
     formatDateString(year, month, date, params = {}) {
-      let formats = [];
-
       let y = IRAN_YEAR_MAP[year];
       if (y) {
-        formats.push({
-          pos: 2,
-          text: "" + y.value
-        });
+        y = "" + y.value;
       }
 
       let m = IRAN_MONTH_MAP.get(month)
       if (m) {
-        formats.push({
-          pos: 1,
-          text: "" + m.text
-        });
+        m = "" + m.text;
       }
 
       let d = date;
       if (caLINEdar.isInt(d)) {
-        formats.push({
-          pos: 0,
-          text: d < 10 ? "0" + d : "" + d
-        });
+        d = d < 10 ? "0" + d : "" + d;
       }
 
-      if (formats.length) {
-        return {
-          year: formats.pop(),
-          month: formats.pop(),
-          date: formats.pop(),
-          delimiter: "/"
+      let format = null;
+      if (y && m && d) {
+        format = {
+          year: {
+            pos: 2,
+            text: y
+          },
+          month: {
+            pos: 1,
+            text: m
+          },
+          date: {
+            pos: 0,
+            text: d
+          }
+        };
+      } else if (y && m) {
+        format = {
+          year: {
+            pos: 1,
+            text: y
+          },
+          month: {
+            pos: 0,
+            text: m
+          },
+        };
+      } else if (m && d) {
+        format = {
+          month: {
+            pos: 1,
+            text: m
+          },
+          date: {
+            pos: 0,
+            text: d
+          }
         };
       }
-      return null;
+      if (format) {
+        format.delimiter = "/";
+      }
+      return format;
     }
 
     toLocaleDateString(jsDate) {
