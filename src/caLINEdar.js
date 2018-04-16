@@ -204,12 +204,18 @@ const caLINEdar = {
    *
    *    - dates {Array} 
    *        An array (count is `MAX_COUNT_DATES_IN_DATE_PICKER`) of dates to display.
-   *         Each date is an object with:
+   *        Each date is an object with:
    *        - text {String} The title of this date
    *        - value {Integer} The data attribute value identifying this date
    *        - picked {bool} whether this date is picked
    *        - special {bool} whether this date should be highlighted as special
    *        - grayOut {bool} whether this date should be gray out (Win over `special`)
+   *
+   *    - noMoreLeft {bool} Optional. `true` means can't flip the year picker
+   *                        leftward any more so hide the left button. Default is `false`
+
+   *    - noMoreRight {bool} Optional. `true` means can't flip the year picker
+   *                         rightward any more so hide the right button. Default is `false`
    */
   showDatePicker(params) {
     if (!this.isCalendarOpen()) {
@@ -232,7 +238,7 @@ const caLINEdar = {
     this.closeMonthPicker();
     this._datePicker.style.display = "";
     this._datePicker.setAttribute("data-caLINEdar-value", params.value);
-    return this._updateDatePicker(params.pickerBtns, params.weekHeaders, params.dates);
+    return this._updateDatePicker(params);
   },
 
   /**
@@ -397,9 +403,10 @@ const caLINEdar = {
 
   // Events end
 
-  async _updateDatePicker(pickerBtns, weekHeaders, dates) {
+  async _updateDatePicker(params) {
     return new Promise(resolve => {
       this._win.requestAnimationFrame(() => {
+        let { pickerBtns, weekHeaders, dates } = params;
         let picker = this._datePicker;
 
         let btns = picker.querySelectorAll(".caLINEdar-panel__btn.picker-btn");
@@ -416,6 +423,7 @@ const caLINEdar = {
         }
 
         this._updateTableCells(table, dates);
+        this._updatePanelButtons(picker, params);
         resolve();
       });
     });

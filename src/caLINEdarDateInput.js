@@ -227,14 +227,21 @@ class CaLINEdarDateInput {
     let days = calendar.getDays();
     let weekHeaders = days.map(d => d.text);
 
-    let dates = this._getLocalDatesToDisplay(year, month, datePicked);
-    
+    let months = calendar.getMonths(year);
+    let prev = this._calcPrevLocalMonth(year, month, months);
+    let next = this._calcNextLocalMonth(year, month, months);
+    let noMoreLeft = !calendar.isDateInCalendar(prev.year, prev.month);
+    let noMoreRight = !calendar.isDateInCalendar(next.year, next.month);
+
     let value = this._serializeValue({ year, month });
+    let dates = this._getLocalDatesToDisplay(year, month, datePicked);
     return {
       dates,
       value,
       pickerBtns,
       weekHeaders,
+      noMoreLeft,
+      noMoreRight,
     };
   }
 
@@ -391,6 +398,12 @@ class CaLINEdarDateInput {
         --emptyCountInStart;
       }
     }
+    while (emptyCountInStart > 0) {
+      // Still empty slots in the start but we can't find dates for them,
+      // just fill in `null` to make them empty dates
+      dates.unshift(null);
+      --emptyCountInStart;
+    }
 
     // Let's see how many empty dates in the tail
     let emptyCountInTail = this.caLINEdar.MAX_COUNT_DATES_IN_DATE_PICKER - dates.length;
@@ -407,12 +420,20 @@ class CaLINEdarDateInput {
         --emptyCountInTail;
       } 
     }
+    while (emptyCountInTail > 0) {
+      // Still empty slots in the tail but we can't find dates for them,
+      // just fill in `null` to make them empty dates
+      dates.push(null);
+      --emptyCountInTail;
+    }
 
     dates.forEach(d => {
-      d.special = d.holiday && !d.grayOut;
-      d.picked = this._datesEqual(d, datePicked);
-      d.text = "" + d.date;
-      d.value = this._serializeValue(d);
+      if (d) {
+        d.special = d.holiday && !d.grayOut;
+        d.picked = this._datesEqual(d, datePicked);
+        d.text = "" + d.date;
+        d.value = this._serializeValue(d);
+      }
     });
     return dates;
   }
