@@ -219,7 +219,7 @@ class CaLINEdarDateInput {
 
         let btnValue = target.getAttribute("data-caLINEdar-value");
         if (btnValue === "year-picker-btn") {
-          this._showYearPicker(value.year, value.year);
+          this._showYearPicker(value.year, value.month);
           return;
         }
         if (btnValue === "month-picker-btn") {
@@ -230,11 +230,11 @@ class CaLINEdarDateInput {
 
       case this.caLINEdar.ID_YEAR_PICKER:
         if (target.classList.contains("left-btn")) {
-          this._flipYearPicker(value.anchorYear, value.years, "left");
+          this._flipYearPicker(value.anchorYear, value.anchorMonth, value.years, "left");
           return;
         }
         if (target.classList.contains("right-btn")) {
-          this._flipYearPicker(value.anchorYear, value.years, "right");
+          this._flipYearPicker(value.anchorYear, value.anchorMonth, value.years, "right");
           return;
         }
         break;
@@ -270,6 +270,13 @@ class CaLINEdarDateInput {
         value = this._unserializeValue(value);
         this._showDatePicker(value.year, value.month, this._localDate);
         break;
+
+      case this.caLINEdar.ID_YEAR_PICKER:
+        let year = parseInt(value);
+        let data = picker.getAttribute("data-caLINEdar-value");
+        data = this._unserializeValue(data);
+        this._showDatePicker(year, data.anchorMonth, this._localDate);
+        break;
     }
   }
 
@@ -293,8 +300,8 @@ class CaLINEdarDateInput {
     this.caLINEdar.showMonthPicker(this._getMonthPickerParams(year, monthPicked));
   }
 
-  _showYearPicker(anchorYear, yearPicked) {
-    this.caLINEdar.showYearPicker(this._getYearPickerParams(anchorYear, yearPicked));
+  _showYearPicker(anchorYear, anchorMonth) {
+    this.caLINEdar.showYearPicker(this._getYearPickerParams(anchorYear, anchorMonth));
   }
 
   _flipDatePicker(year, month, dir) {
@@ -308,11 +315,11 @@ class CaLINEdarDateInput {
     this.caLINEdar.showDatePicker(params);
   }
 
-  _flipYearPicker(currentYearPicked, years, dir) {
+  _flipYearPicker(anchorYear, anchorMonth, years, dir) {
     // TODO: utilize `dir` to do RTL
     dir = dir === "right" ? 1 : -1;
-    let target = currentYearPicked + dir * years.length;
-    this.caLINEdar.showYearPicker(this._getYearPickerParams(target));
+    anchorYear = anchorYear + dir * years.length;
+    this.caLINEdar.showYearPicker(this._getYearPickerParams(anchorYear, anchorMonth));
   }
 
   _getDatePickerParams(year, month, datePicked) {
@@ -369,7 +376,7 @@ class CaLINEdarDateInput {
     };
   }
 
-  _getYearPickerParams(anchorYear, yearPicked) {
+  _getYearPickerParams(anchorYear, anchorMonth) {
     const COUNT = this.caLINEdar.MAX_COUNT_YEAR_IN_YEAR_PICKER;
     // Collect years to pick (try to put the piced year in the center)
     let years = [];
@@ -392,13 +399,13 @@ class CaLINEdarDateInput {
     // Build the pramas
     let value = this._serializeValue({ 
       anchorYear,
+      anchorMonth,
       years: years.slice()
     });
     years = years.map(y => {
       return {
         text: y,
         value: y,
-        picked: y === yearPicked
       };
     });
     return {
