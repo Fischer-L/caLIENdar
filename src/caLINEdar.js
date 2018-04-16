@@ -98,6 +98,7 @@ const caLINEdar = {
     let x = parseFloat(v);
     return (x | 0) === x;
   },
+  
   async positionCalendar(window, anchorInput) {
     if (!this._calendar) {
       return;

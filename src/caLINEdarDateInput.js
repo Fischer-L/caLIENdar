@@ -4,11 +4,13 @@ class CaLINEdarDateInput {
   /**
    * @param params {Object}
    *    The params provided by users
-   *    - date {*} Optional. See `setDate`
    *    - calendar {CaLINEdarCalender} The calendar so we can get dates to pick
+   *    - date {*} Optional. See `setDate`
+   *    - event types {Function} The events to subscribe. See `subscribe` for events.
    *
    *    The params provided by our caLINEdar lib.
-   *    Usually a user doesn't have to provide these for the daily usage.
+   *    Usually a user doesn't have to provide these for the daily usage
+   *    if create a CaLINEdarDateInput instance through the `caLINEdar` object.
    *    Having these is for the case if we want to do testing in the future.
    *    - caLINEdar {Object} the caLINEdar object
    *    - input {HTMLInputElement} one input element
@@ -31,6 +33,10 @@ class CaLINEdarDateInput {
 
     if (!this.setDate(date)) {
       this.clearDate();
+    }
+
+    for (let prop in params) {
+      this.subscribe(prop, params[prop]);
     }
 
     input.addEventListener("focus", this.onFocus);
