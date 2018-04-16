@@ -162,7 +162,7 @@ function createStandardCalender(caLINEdar) {
       return "YYYY/MM/DD";
     }
 
-    formatDateString(year, month, date) {
+    getDateStringFormat(year, month, date) {
       let y = this._isValidYear(year) ? "" + year : null;
       
       let m = MONTH_MAP.get(month);

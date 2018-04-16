@@ -227,7 +227,7 @@ function createIranSolarHijriCalender(caLINEdar) {
       return "DD/MM/YYYY"; 
     }
 
-    formatDateString(year, month, date) {
+    getDateStringFormat(year, month, date) {
       let y = IRAN_YEAR_MAP[year];
       if (y) {
         y = "" + y.value;
@@ -296,7 +296,7 @@ function createIranSolarHijriCalender(caLINEdar) {
         jsDate.getDate()
       );
       if (d) {
-        let format = this.formatDateString(
+        let format = this.getDateStringFormat(
           d.year,
           d.month,
           d.date

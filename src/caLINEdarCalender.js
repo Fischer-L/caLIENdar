@@ -32,7 +32,7 @@ class CaLINEdarCalender {
    *
    * @return {Array} 
    *    For example There is a JS Date-based calendar and a date as `new Date(2018, 3, 9)`.
-   *    Calling `formatDateString(2018, 3, 9)` would return an object as
+   *    Calling `getDateStringFormat(2018, 3, 9)` would return an object as
    *    ```
    *    {
    *      year: {
@@ -53,8 +53,8 @@ class CaLINEdarCalender {
    *    which means this calendar prefers a date string format as "Apr/10/2018".
    *    If unable to format, `null`.
    */
-  formatDateString(year, month, date) {
-    throw new Error("formatDateString not implemented");
+  getDateStringFormat(year, month, date) {
+    throw new Error("getDateStringFormat not implemented");
   }
 
   /**

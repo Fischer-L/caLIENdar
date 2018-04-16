@@ -324,7 +324,7 @@ class CaLINEdarDateInput {
 
   _getDatePickerParams(year, month, datePicked) {
     let calendar = this._calendar;
-    let format = calendar.formatDateString(year, month);
+    let format = calendar.getDateStringFormat(year, month);
     let pickerBtns = [];
     pickerBtns.push({
       text: format.year.text,

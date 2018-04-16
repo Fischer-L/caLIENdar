@@ -61,7 +61,7 @@ describe("StandardCalender", () => {
       },
     ];
     dateFormats.forEach(d => {
-      let format = calender.formatDateString(...d.date);
+      let format = calender.getDateStringFormat(...d.date);
       expect(JSON.stringify(format)).toBe(JSON.stringify(d.expected));
     });
   });

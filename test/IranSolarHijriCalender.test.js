@@ -120,7 +120,7 @@ describe("IranSolarHijriCalender", () => {
       },
     ];
     dateFormats.forEach(d => {
-      let format = iranCalendar.formatDateString(...d.date);
+      let format = iranCalendar.getDateStringFormat(...d.date);
       expect(JSON.stringify(format)).toBe(JSON.stringify(d.expected));
     });
   });
