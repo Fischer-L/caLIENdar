@@ -79,7 +79,6 @@ const caLINEdar = {
     let mm = parseInt(now.substr(14, 2));
     let ss = parseInt(now.substr(17, 2));
     now = new Date(YYYY, MM, DD, hh, mm, ss);
-
     // Recalculate `now` based on the timezone
     return new Date(now.getTime() - now.getTimezoneOffset() * 60000);
   },

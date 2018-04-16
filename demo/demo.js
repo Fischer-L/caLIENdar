@@ -77,3 +77,5 @@ window.iranDateInput = caLINEdar.createDateInput({
   mountElem: iranDatePicker,
   calendar: window.iranCalendar,
 });
+iranDateInput.subscribe("onChange", inp => console.log("onChange", inp.getDate()));
+

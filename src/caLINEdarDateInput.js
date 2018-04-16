@@ -27,6 +27,7 @@ class CaLINEdarDateInput {
 
     this._win = params.window;
     this._calendar = calendar;
+    this._events = {};
 
     if (!this.setDate(date)) {
       this.clearDate();
@@ -38,8 +39,19 @@ class CaLINEdarDateInput {
   }
 
   /**
-   * @param date {Date|Integer} The date to set.
-   *                            Important: this date should based on the unix time.
+   * @return {Date} The currently picked date in the unix time. `null` if none is picked.
+   */
+  getDate() {
+    return this._unixDate ? Math.floor(this._unixDate.getTime() / 1000) : null;
+  }
+
+  /**
+   * Set the date picked
+   *
+   * @param date {Date|Integer} 
+   *    A unix time or js date based on the unix time.
+   *    The definition of a unix time: https://en.wikipedia.org/wiki/Unix_time
+   *
    * @return {bool} `true` if set or `false`
    */
   setDate(date) {
@@ -47,12 +59,19 @@ class CaLINEdarDateInput {
     if (date instanceof Date) {
       newDate = date;
     } else if (this.caLINEdar.isInt(date)) {
-      newDate = new Date(date);
+      // The unit of a unix time is sec
+      newDate = new Date(date * 1000);
     }
     
     if (newDate === null) {
       return false;
     }
+    // Always align the date and get rid of the ms part.
+    newDate = new Date(
+      newDate.getFullYear(),
+      newDate.getMonth(),
+      newDate.getDate()
+    );
 
     let calendar = this._calendar;
     let local = calendar.convertJSDate2LocalDate(
@@ -71,14 +90,17 @@ class CaLINEdarDateInput {
       return false;
     }
 
-    this._jsDate = newDate;
+    this._unixDate = newDate;
     this._localDate = local;
-    this.input.value = calendar.toLocaleDateString(this._jsDate);
+    this.input.value = calendar.toLocaleDateString(this._unixDate);
     return true;
   }
 
+  /**
+   * Clear the date picked
+   */
   clearDate() {
-    this._jsDate =
+    this._unixDate =
     this._localDate = null;
     this.input.value = this._calendar.getDateStringPlaceholder();
   }
@@ -91,6 +113,43 @@ class CaLINEdarDateInput {
     let dateLocal = datePicked || this._calendar.getNow({ fallback: "last-date" });
     let params = this._getDatePickerParams(dateLocal.year, dateLocal.month, datePicked);
     this.caLINEdar.openCalendar(this.input, params);
+  }
+
+  /**
+   * Subscribe a event. The Valid events are:
+   * - onChange: Called when the date picked is changed
+   *
+   * @param eventType {Stirng} The event type
+   * @param handler {Functoin}
+   *    The event handler. 
+   *    When invoked, this CaLINEdarDateInput instance will be pass in.
+   */
+  subscribe(eventType, handler) {
+    if (!this._validEventTypes) {
+      this._validEventTypes = [ "onChange" ];
+    }
+
+    if (typeof handler === "function" &&
+        this._validEventTypes.indexOf(eventType) >= 0
+    ) {
+      let queue = this._events[eventType] || [];
+      queue.push(handler);
+      this._events[eventType] = queue;
+    }
+  }
+
+
+  /**
+   * Unsubscribe a event
+   *
+   * @param eventType {Stirng} The event type
+   * @param handler {Functoin} The event handler to unsubscribe
+   */
+  unsubscribe(eventType, handler) {
+    let queue = this._events[eventType];
+    if (queue && typeof handler === "function") {
+      this._events[eventType] = queue.filter(h => h !== handler);
+    }
   }
 
   // Public APIs end
@@ -121,8 +180,8 @@ class CaLINEdarDateInput {
     e.preventDefault();
     e.stopPropagation();
 
-    // When clicking outside the input, it will lose focus,
-    // which will cause the calendar closed.
+    // When clicking outside the input,
+    // it will cause the calendar closed and the input loses focus.
     await this._ensureFocus();
 
     let { picker, target } = e.detail;
@@ -176,11 +235,46 @@ class CaLINEdarDateInput {
     }
   }
 
-  _onPick(pickerId, target) {
-    // TODO
+  _onPick(picker, target) {
+    let value = this._unserializeValue(
+      target.getAttribute("data-caLINEdar-value"));
+    if (!value) {
+      return;
+    }
+
+    switch (picker.id) {
+      case this.caLINEdar.ID_DATE_PICKER:
+        let jsDate = this._calendar.convertLocalDate2JSDate(
+          value.year, value.month, value.date);
+        jsDate = new Date(jsDate.year, jsDate.month, jsDate.date);
+        if (this.setDate(jsDate)) {
+          // The date has changed so refresh the date picker
+          this._showDatePicker(
+            this._localDate.year,
+            this._localDate.month, 
+            this._localDate
+          );
+          this._notify("onChange");
+        }
+        break;
+    }
   }
 
   // caLINEdar events end
+
+  _notify(eventType) {
+    let queue = this._events[eventType];
+    if (queue && queue.length > 0) {
+      this._win.requestAnimationFrame(() => {
+        queue.forEach(handler => handler(this));
+      });
+    }
+  }
+
+  _showDatePicker(year, month, datePicked) {
+    let params = this._getDatePickerParams(year, month, datePicked);
+    this.caLINEdar.showDatePicker(params);
+  }
 
   _showMonthPicker(year, monthPicked) {
     this.caLINEdar.showMonthPicker(this._getMonthPickerParams(year, monthPicked));
@@ -276,12 +370,7 @@ class CaLINEdarDateInput {
     let noMoreRight = !this._calendar.isDateInCalendar(years[COUNT - 1] + 1);
 
     // Remove years not in the calendar
-    years = years.reduce((ys, y) => {
-      if (this._calendar.isDateInCalendar(y)) {
-        ys.push(y);
-      }
-      return ys;
-    }, []);
+    years = years.filter(y => this._calendar.isDateInCalendar(y));
 
     // Build the pramas
     let value = this._serializeValue({ 
@@ -333,12 +422,16 @@ class CaLINEdarDateInput {
            a.date === b.date;
   }
 
-  _serializeValue(date) {
-    return JSON.stringify(date);
+  _serializeValue(v) {
+    return JSON.stringify(v);
   }
 
-  _unserializeValue(dateStr) {
-    return JSON.parse(dateStr);
+  _unserializeValue(valueStr) {
+    try {
+      return JSON.parse(valueStr);
+    } catch (e) {
+      return null;
+    }
   }
 
   _calcPrevLocalMonth(year, month, months) {
