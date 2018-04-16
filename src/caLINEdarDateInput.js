@@ -139,7 +139,7 @@ class CaLINEdarDateInput {
   }
 
   _onPanelButtonClick(picker, target) {
-    let value = this._unserializeLocalDate(
+    let value = this._unserializeValue(
       picker.getAttribute("data-caLINEdar-value"));
     switch (picker.id) {
       case this.caLINEdar.ID_DATE_PICKER:
@@ -211,7 +211,7 @@ class CaLINEdarDateInput {
 
     let dates = this._getLocalDatesToDisplay(year, month, datePicked);
     
-    let value = this._serializeLocalDate({ year, month });
+    let value = this._serializeValue({ year, month });
     return {
       dates,
       value,
@@ -226,7 +226,7 @@ class CaLINEdarDateInput {
       m.picked = m.value === monthPicked;
       return m;
     });
-    let value = this._serializeLocalDate({ month: monthPicked });
+    let value = this._serializeValue({ month: monthPicked });
     return {
       value,
       months
@@ -262,7 +262,7 @@ class CaLINEdarDateInput {
         picked: y === yearPicked
       };
     });
-    let value = this._serializeLocalDate({ year: yearPicked });
+    let value = this._serializeValue({ year: yearPicked });
     return {
       value,
       years
@@ -299,11 +299,11 @@ class CaLINEdarDateInput {
            a.date === b.date;
   }
 
-  _serializeLocalDate(date) {
+  _serializeValue(date) {
     return JSON.stringify(date);
   }
 
-  _unserializeLocalDate(dateStr) {
+  _unserializeValue(dateStr) {
     return JSON.parse(dateStr);
   }
 
@@ -385,7 +385,7 @@ class CaLINEdarDateInput {
       d.special = d.holiday && !d.grayOut;
       d.picked = this._datesEqual(d, datePicked);
       d.text = "" + d.date;
-      d.value = this._serializeLocalDate(d);
+      d.value = this._serializeValue(d);
     });
     return dates;
   }
