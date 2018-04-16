@@ -8,6 +8,18 @@ describe("IranSolarHijriCalender", () => {
 
   const dates = [
     {
+      js: [2016, 9, 17],
+      iran: [1395, 6, 26]
+    },
+    {
+      js: [2018, 3, 20],
+      iran: [1397, 0, 31]
+    },
+    {
+      js: [2018, 3, 21],
+      iran: [1397, 1, 1]
+    },
+    {
       js: [1975, 2, 21],
       iran: [1354, 0, 1]
     },

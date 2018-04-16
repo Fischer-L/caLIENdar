@@ -481,12 +481,10 @@ function createIranSolarHijriCalender(caLINEdar) {
       let localDate = 1;
       while (daysPassed > 0) {
         let passed = this._calcDayNumbersByLocal(localMonth, iranYear.leapYear);
-        if (daysPassed > passed) {
+        if (daysPassed >= passed) {
           localMonth++;
         } else if (daysPassed < passed) {
           localDate += daysPassed;
-        } else {
-          localDate = daysPassed;
         }
         daysPassed -= passed;
       }
