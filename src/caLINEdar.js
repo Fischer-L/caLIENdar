@@ -1,5 +1,6 @@
 import CaLINEdarCalender from "./caLINEdarCalender";
 import CaLINEdarDateInput from "./caLINEdarDateInput";
+import createStandardCalender from "./StandardCalender";
 
 const caLINEdar = {
   /** Public APIs **/
@@ -20,7 +21,12 @@ const caLINEdar = {
    * @param params {Object} the parameters to create a `CaLINEdarDateInput`, including
    *    - mountElem {HTMLElement} The element where the input element sits. 
    *                              One input element will be created for you so don't pass another one.
+   *
    *    - The parameters for constructing `CaLINEdarDateInput` so please refer to that.
+   *
+   *    - calendar {*} If not given, will use the standard calendar. See `CaLINEdarDateInput`.
+   *    - date {*} See `CaLINEdarDateInput`.
+   *    - event types {*} See `CaLINEdarDateInput`.
    *
    * @return {CaLINEdarDateInput} An instance of `CaLINEdarDateInput`
    */
@@ -39,6 +45,12 @@ const caLINEdar = {
       caLINEdar: this,
       window: this._win
     });
+    if (!dateInputParams.calendar) {
+      if (!this._defaultCalendar) {
+        this._defaultCalendar = createStandardCalender(this);
+      }
+      dateInputParams.calendar = this._defaultCalendar;
+    }
     delete dateInputParams.mountElem; // Delete unnecessary params
     let dateInput = new this.CaLINEdarDateInput(dateInputParams);
     mountElem.appendChild(input);

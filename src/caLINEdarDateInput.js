@@ -6,7 +6,7 @@ class CaLINEdarDateInput {
    *    The params provided by users
    *    - calendar {CaLINEdarCalender} The calendar so we can get dates to pick
    *    - date {*} Optional. See `setDate`
-   *    - event types {Function} The events to subscribe. See `subscribe` for events.
+   *    - event types {Function} Optional. The events to subscribe. See `subscribe` for events.
    *
    *    The params provided by our caLINEdar lib.
    *    Usually a user doesn't have to provide these for the daily usage

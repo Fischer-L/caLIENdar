@@ -128,6 +128,7 @@ function createStandardCalender(caLINEdar) {
   class StandardCalendar extends caLINEdar.CaLINEdarCalender {
     constructor() {
       super();
+      this._MS_ONE_DAY = 24 * 60 * 60 * 1000;
     }
 
     isDateInCalendar(year, month, date) {
@@ -219,6 +220,16 @@ function createStandardCalender(caLINEdar) {
       return format;
     }
 
+    toLocaleDateString(jsDate) {
+      let y = jsDate.getFullYear();
+      let m = jsDate.getMonth() + 1;
+      let d = jsDate.getDate();
+      let strs = [ y ];
+      strs.push(m > 10 ? m : "0" + m);
+      strs.push(d > 10 ? d : "0" + d);
+      return strs.join("/");
+    }
+
     _isValidYear(y) {
       // In JS Date, `00` ~ `99` means 1900 ~ 1999.
       // To avoid confusion, we demand at least 100.
@@ -226,6 +237,70 @@ function createStandardCalender(caLINEdar) {
       // And if someone needed a year under 100,
       // then we can build another calendar for that.
       return caLINEdar.isInt(y) && y >= 100;
+    }
+
+    getNow() {
+      let now = caLINEdar.getNowInLocalTimezone();
+      return {
+        year: now.getFullYear(),
+        month: now.getMonth(),
+        date: now.getDate()
+      }
+    }
+
+    getMonths() {
+      let months = [];
+      MONTH_MAP.forEach(m => {
+        months.push({
+          text: m.text,
+          value: m.value
+        });
+      });
+      return months;
+    }
+
+    getDays() {
+      let weekDays = [];
+      DAYS_MAP.forEach(d => {
+        weekDays.push({
+          text: d.text,
+          value: d.value
+        });
+      });
+      return weekDays;
+    }
+
+    getDates(year, month) {
+      if (!this.isDateInCalendar(year, month)) {
+        return null;
+      }
+
+      let dates = [];
+      let d = new Date(year, month, 1);
+      while (month === d.getMonth()) {
+        let date = {
+          year,
+          month,
+          date: d.getDate(),
+          day: d.getDay()
+        };
+        date.holiday = date.day === 0;
+        dates.push(date);
+        // Advance one day
+        d = new Date(d.getTime() + this._MS_ONE_DAY);
+      }
+      return dates;
+    }
+
+    convertLocalDate2JSDate(year, month, date) {
+      if (!this.isDateInCalendar(year, month, date)) {
+        return null;
+      }
+      return { year, month, date };
+    }
+
+    convertJSDate2LocalDate(year, month, date) {
+      return this.convertLocalDate2JSDate(year, month, date);
     }
   }
 

@@ -71,7 +71,7 @@ class CaLINEdarCalender {
   /**
    * Get today's date values per this calendar
    *
-   * @params options {Object} Options are:
+   * @params options {Object} Optional. Options are:
    *    - fallback {String} "1st-date" | "last-date"
    *
    * @return {Object} 
@@ -88,7 +88,9 @@ class CaLINEdarCalender {
   }
 
   /**
-   * @params {Array}
+   * @param year {Integer} Optional. Passed if needed a year to determin months
+   *
+   * @return {Array}
    *    One array of objects representing months.
    *    The 1st one is the 1st month. Each month object is as below:
    *    - text {String} The title of this month
@@ -127,6 +129,17 @@ class CaLINEdarCalender {
     throw new Error("getDates not implemented");
   }
 
+  /**
+   * @param year {Integer} the year value per this calendar
+   * @param month {Integer} the month value per this calendar
+   * @param date {Integer} the date value per this calendar
+   *
+   * @return {Object} An object with
+   *                  - year {integer} the year value per JS Date
+   *                  - month {integer} the month value per JS Date
+   *                  - date {integer} the date value per JS Date
+   *                  Or `null` if unable to convert
+   */
   convertLocalDate2JSDate(year, month, date) {
     throw new Error("convertLocalDate2JSDate not implemented");
   }
