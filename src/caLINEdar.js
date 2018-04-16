@@ -11,7 +11,7 @@ const caLINEdar = {
   init(win) {
     this._win = win;
     this._doc = win.document;
-    this._createCalendarHolder();
+    this._createCalendar();
 
     win.addEventListener("click", e => this._onClick(e));
     win.addEventListener("touchend", e => this._onClick(e));
@@ -110,55 +110,6 @@ const caLINEdar = {
     let x = parseFloat(v);
     return (x | 0) === x;
   },
-  
-  async positionCalendar(window, anchorInput) {
-    if (!this._calendar) {
-      return;
-    }
-    return new Promise(resolve => {
-      window.requestAnimationFrame(() => {
-        let winW = window.innerWidth;
-        let winH = window.innerHeight;
-
-        let calendarW = parseInt(this._calendar.getAttribute("data-caLINEdar-width"));
-        let calendarH = parseInt(this._calendar.getAttribute("data-caLINEdar-height"));
-        if (!calendarW) {
-          // `getBoundingClientRect` is expensive so cache it. 
-          let rect = this._calendar.getBoundingClientRect();
-          calendarW = rect.width;
-          calendarH = rect.height;
-          this._calendar.setAttribute("data-caLINEdar-width", calendarW);
-          this._calendar.setAttribute("data-caLINEdar-height", calendarH)
-        }
-
-        // Unfortunately, we can't cache `anchorInput`
-        // because its dimesion may change, not in our control.
-        let inputRect = anchorInput.getBoundingClientRect();
-
-        // First decdie our calendar on top of or below `anchorInput`
-        if (winH - inputRect.bottom > calendarH + 10) {
-          // OK there is enough room below `anchorInput`
-          this._calendar.classList.remove("on-top");
-          this._calendar.style.top = (inputRect.bottom + 8) + "px";
-        } else {
-          this._calendar.classList.add("on-top");
-          this._calendar.style.top = (inputRect.top - calendarH - 8) + "px";
-        }
-
-        // Second decdie our calendar's horizontal postion
-        if (winW - inputRect.left > calendarW + 10) {
-          // OK there is enough room on the right side of `anchorInput`
-          this._calendar.classList.remove("arrow-on-right");
-          this._calendar.style.left = inputRect.left + "px";
-        } else {
-          this._calendar.classList.add("arrow-on-right");
-          this._calendar.style.left = (inputRect.right - calendarW) + "px";
-        }
-
-        resolve();
-      });
-    });
-  },
 
   isCalendarOpen() {
     return this._calendar && this._calendar.hasAttribute("data-caLINEdar-opened");
@@ -186,7 +137,7 @@ const caLINEdar = {
     await this.showDatePicker(params);
     // Let's always position the calendar after our picker is populated
     // so as to make sure the correct dimension is layouted when positioning. 
-    await this.positionCalendar(this._win, anchorInput);
+    await this._positionCalendar(anchorInput);
     this._calendar.style.visibility = "";
   },
 
@@ -196,6 +147,7 @@ const caLINEdar = {
       return;
     }
     this._calendar.style.display = "none";
+    this._mobileBackground.style.display = "none";
     this._calendar.removeAttribute("data-caLINEdar-opened");
   },
 
@@ -372,15 +324,16 @@ const caLINEdar = {
       // nowhere has to do with us.
       return;
     }
+    let { target } = e;
 
-    if (e.target === this._dateInput.input) {
+    if (target === this._dateInput.input) {
       // User is clicking on the input.
       // Has nothing to do with here too.
       return;
     }
 
     let picker = null;
-    let node = e.target;
+    let node = target;
     while (node && !picker) {
       if (node.classList && node.classList.contains("caLINEdar-picker")) {
         picker = node;
@@ -388,17 +341,13 @@ const caLINEdar = {
         node = node.parentNode;
       }
     }
-
     if (picker) {
       e.preventDefault();
       e.stopPropagation();
-      this._notifyDateInput(this.EVENT_PICKER_CLICK, {
-        picker: picker,
-        target: e.target,
-      });
-    } else {
-      this._notifyDateInput(this.EVENT_CLICK_OUTSIDE_PICKER);
+      this._notifyDateInput(this.EVENT_PICKER_CLICK, { picker, target });
+      return;
     }
+    this._notifyDateInput(this.EVENT_CLICK_OUTSIDE_PICKER);
   },
 
   _notifyDateInput(eventType, detail) {
@@ -671,14 +620,98 @@ const caLINEdar = {
     return picker;
   },
 
-  _createCalendarHolder() {
+  _createCalendar() {
     if (!this._calendar) {
+      let frag = this._doc.createDocumentFragment();
+      this._mobileBackground = this._doc.createElement("div");
+      this._mobileBackground.className = "caLINEdar-mobile-background";
+      this._mobileBackground.style.display = "none";
+      frag.appendChild(this._mobileBackground);
+
       this._calendar = this._doc.createElement("div");
-      this._calendar.classList.add("caLINEdar");
+      this._calendar.className = "caLINEdar";
       this._calendar.style.display = "none";
-      this._doc.body.appendChild(this._calendar);
+      frag.appendChild(this._calendar);
+
+      this._doc.body.appendChild(frag);
     }
   },
+
+  _isSmallScreen() {
+    // Why not using @media in CSS?
+    // We must stop `_positionCalendarOnBigScreen` in js,
+    // so matching media here is required.
+    // To reduce the duplicate media query rules in JS and CSS,
+    // let's test media condition and control styles by CSS selector in JS.
+    let media = "(max-width: 768px)"; // 768px is iPad
+    return this._win.matchMedia(media).matches;
+  },
+
+  _positionCalendarOnSmallScreen() {
+    this._mobileBackground.style.display = "";
+    this._calendar.classList.add("small-screen");
+  },
+
+  _positionCalendarOnBigScreen(anchorInput) {
+    let winW = this._win.innerWidth;
+    let winH = this._win.innerHeight;
+
+    let calendarW = parseInt(this._calendar.getAttribute("data-caLINEdar-width"));
+    let calendarH = parseInt(this._calendar.getAttribute("data-caLINEdar-height"));
+    if (!calendarW) {
+      // `getBoundingClientRect` is expensive so cache it. 
+      let rect = this._calendar.getBoundingClientRect();
+      calendarW = rect.width;
+      calendarH = rect.height;
+      this._calendar.setAttribute("data-caLINEdar-width", calendarW);
+      this._calendar.setAttribute("data-caLINEdar-height", calendarH)
+    }
+
+    // Unfortunately, we can't cache `anchorInput`
+    // because its dimesion may change, not in our control.
+    let inputRect = anchorInput.getBoundingClientRect();
+
+    // First decdie our calendar on top of or below `anchorInput`
+    if (winH - inputRect.bottom > calendarH + 10) {
+      // OK there is enough room below `anchorInput`
+      this._calendar.classList.remove("on-top");
+      this._calendar.style.top = (inputRect.bottom + 8) + "px";
+    } else {
+      this._calendar.classList.add("on-top");
+      this._calendar.style.top = (inputRect.top - calendarH - 8) + "px";
+    }
+
+    // Second decdie our calendar's horizontal postion
+    if (winW - inputRect.left > calendarW + 10) {
+      // OK there is enough room on the right side of `anchorInput`
+      this._calendar.classList.remove("arrow-on-right");
+      this._calendar.style.left = inputRect.left + "px";
+    } else {
+      this._calendar.classList.add("arrow-on-right");
+      this._calendar.style.left = (inputRect.right - calendarW) + "px";
+    }
+
+    // Finally, we are not on a small screen
+    this._mobileBackground.style.display = "none";
+    this._calendar.classList.remove("small-screen");
+  },
+  
+  async _positionCalendar(anchorInput) {
+    if (!this._calendar) {
+      return;
+    }
+    return new Promise(resolve => {
+      this._win.requestAnimationFrame(() => {
+        if (this._isSmallScreen()) {
+          this._positionCalendarOnSmallScreen();
+        } else {
+          this._positionCalendarOnBigScreen(anchorInput);
+        }
+        resolve();
+      });
+    });
+  },
+
 };
 caLINEdar.StandardCalendar = getStandardCalenderClass(caLINEdar);
 
