@@ -227,13 +227,13 @@ function createIranSolarHijriCalender(caLINEdar) {
       return "DD/MM/YYYY"; 
     }
 
-    formatDateString(year, month, date, params = {}) {
+    formatDateString(year, month, date) {
       let y = IRAN_YEAR_MAP[year];
       if (y) {
         y = "" + y.value;
       }
 
-      let m = IRAN_MONTH_MAP.get(month)
+      let m = IRAN_MONTH_MAP.get(month);
       if (m) {
         m = "" + m.text;
       }
