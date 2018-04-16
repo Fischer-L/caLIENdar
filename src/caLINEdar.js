@@ -1,6 +1,6 @@
 import CaLINEdarCalender from "./caLINEdarCalender";
 import CaLINEdarDateInput from "./caLINEdarDateInput";
-import createStandardCalender from "./StandardCalender";
+import { getStandardCalenderClass, createStandardCalender } from "./StandardCalender";
 
 const caLINEdar = {
   /** Public APIs **/
@@ -679,7 +679,7 @@ const caLINEdar = {
       this._doc.body.appendChild(this._calendar);
     }
   },
-
 };
+caLINEdar.StandardCalendar = getStandardCalenderClass(caLINEdar);
 
 module.exports = caLINEdar;

@@ -123,188 +123,196 @@ const DAYS_MAP = new Map([
   ],
 ]);
 
-function createStandardCalender(caLINEdar) {
-  
-  class StandardCalendar extends caLINEdar.CaLINEdarCalender {
-    constructor() {
-      super();
-      this._MS_ONE_DAY = 24 * 60 * 60 * 1000;
-    }
+let _StandardCalendar = null;
 
-    isDateInCalendar(year, month, date) {
-      if (!this._isValidYear(year)) {
-        return false;
+function getStandardCalenderClass(caLINEdar) {
+  if (!_StandardCalendar) {
+    class StandardCalendar extends caLINEdar.CaLINEdarCalender {
+      constructor() {
+        super();
+        this._MS_ONE_DAY = 24 * 60 * 60 * 1000;
       }
 
-      if (caLINEdar.isInt(month)) {
-        let m = MONTH_MAP.get(month);
-        if (!m) {
+      isDateInCalendar(year, month, date) {
+        if (!this._isValidYear(year)) {
           return false;
         }
 
-        if (caLINEdar.isInt(date)) {
-          try {
-            let d = new Date(year, month, date);
-            return d.getFullYear() === year &&
-                   d.getMonth() === month &&
-                   d.getDate() === date;
-
-          } catch (e) {
+        if (caLINEdar.isInt(month)) {
+          let m = MONTH_MAP.get(month);
+          if (!m) {
             return false;
           }
+
+          if (caLINEdar.isInt(date)) {
+            try {
+              let d = new Date(year, month, date);
+              return d.getFullYear() === year &&
+                     d.getMonth() === month &&
+                     d.getDate() === date;
+
+            } catch (e) {
+              return false;
+            }
+          }
+        }
+
+        return true;
+      }
+
+      getDateStringPlaceholder() {
+        return "YYYY/MM/DD";
+      }
+
+      getDateStringFormat(year, month, date) {
+        let y = this._isValidYear(year) ? "" + year : null;
+        
+        let m = MONTH_MAP.get(month);
+        if (m) {
+          m = m.text;
+        }
+
+        let d = date;
+        if (caLINEdar.isInt(d)) {
+          d = d < 10 ? "0" + d : "" + d;
+        }
+
+        let format = null;
+        if (y && m && d) {
+          format = {
+            year: {
+              pos: 0,
+              text: y
+            },
+            month: {
+              pos: 1,
+              text: m
+            },
+            date: {
+              pos: 2,
+              text: d
+            }
+          };
+        } else if (y && m) {
+          format = {
+            year: {
+              pos: 0,
+              text: y
+            },
+            month: {
+              pos: 1,
+              text: m
+            },
+          };
+        } else if (m && d) {
+          format = {
+            month: {
+              pos: 0,
+              text: m
+            },
+            date: {
+              pos: 1,
+              text: d
+            }
+          };
+        }
+        if (format) {
+          format.delimiter = "/";
+        }
+        return format;
+      }
+
+      toLocaleDateString(jsDate) {
+        let y = jsDate.getFullYear();
+        let m = jsDate.getMonth() + 1;
+        let d = jsDate.getDate();
+        let strs = [ y ];
+        strs.push(m >= 10 ? m : "0" + m);
+        strs.push(d >= 10 ? d : "0" + d);
+        return strs.join("/");
+      }
+
+      getNow() {
+        let now = caLINEdar.getNowInLocalTimezone();
+        return {
+          year: now.getFullYear(),
+          month: now.getMonth(),
+          date: now.getDate()
         }
       }
 
-      return true;
-    }
-
-    getDateStringPlaceholder() {
-      return "YYYY/MM/DD";
-    }
-
-    getDateStringFormat(year, month, date) {
-      let y = this._isValidYear(year) ? "" + year : null;
-      
-      let m = MONTH_MAP.get(month);
-      if (m) {
-        m = m.text;
-      }
-
-      let d = date;
-      if (caLINEdar.isInt(d)) {
-        d = d < 10 ? "0" + d : "" + d;
-      }
-
-      let format = null;
-      if (y && m && d) {
-        format = {
-          year: {
-            pos: 0,
-            text: y
-          },
-          month: {
-            pos: 1,
-            text: m
-          },
-          date: {
-            pos: 2,
-            text: d
-          }
-        };
-      } else if (y && m) {
-        format = {
-          year: {
-            pos: 0,
-            text: y
-          },
-          month: {
-            pos: 1,
-            text: m
-          },
-        };
-      } else if (m && d) {
-        format = {
-          month: {
-            pos: 0,
-            text: m
-          },
-          date: {
-            pos: 1,
-            text: d
-          }
-        };
-      }
-      if (format) {
-        format.delimiter = "/";
-      }
-      return format;
-    }
-
-    toLocaleDateString(jsDate) {
-      let y = jsDate.getFullYear();
-      let m = jsDate.getMonth() + 1;
-      let d = jsDate.getDate();
-      let strs = [ y ];
-      strs.push(m > 10 ? m : "0" + m);
-      strs.push(d > 10 ? d : "0" + d);
-      return strs.join("/");
-    }
-
-    _isValidYear(y) {
-      // In JS Date, `00` ~ `99` means 1900 ~ 1999.
-      // To avoid confusion, we demand at least 100.
-      // This should be ok for the most cases.
-      // And if someone needed a year under 100,
-      // then we can build another calendar for that.
-      return caLINEdar.isInt(y) && y >= 100;
-    }
-
-    getNow() {
-      let now = caLINEdar.getNowInLocalTimezone();
-      return {
-        year: now.getFullYear(),
-        month: now.getMonth(),
-        date: now.getDate()
-      }
-    }
-
-    getMonths() {
-      let months = [];
-      MONTH_MAP.forEach(m => {
-        months.push({
-          text: m.text,
-          value: m.value
+      getMonths() {
+        let months = [];
+        MONTH_MAP.forEach(m => {
+          months.push({
+            text: m.text,
+            value: m.value
+          });
         });
-      });
-      return months;
-    }
+        return months;
+      }
 
-    getDays() {
-      let weekDays = [];
-      DAYS_MAP.forEach(d => {
-        weekDays.push({
-          text: d.text,
-          value: d.value
+      getDays() {
+        let weekDays = [];
+        DAYS_MAP.forEach(d => {
+          weekDays.push({
+            text: d.text,
+            value: d.value
+          });
         });
-      });
-      return weekDays;
-    }
-
-    getDates(year, month) {
-      if (!this.isDateInCalendar(year, month)) {
-        return null;
+        return weekDays;
       }
 
-      let dates = [];
-      let d = new Date(year, month, 1);
-      while (month === d.getMonth()) {
-        let date = {
-          year,
-          month,
-          date: d.getDate(),
-          day: d.getDay()
-        };
-        date.holiday = date.day === 0;
-        dates.push(date);
-        // Advance one day
-        d = new Date(d.getTime() + this._MS_ONE_DAY);
-      }
-      return dates;
-    }
+      getDates(year, month) {
+        if (!this.isDateInCalendar(year, month)) {
+          return null;
+        }
 
-    convertLocalDate2JSDate(year, month, date) {
-      if (!this.isDateInCalendar(year, month, date)) {
-        return null;
+        let dates = [];
+        let d = new Date(year, month, 1);
+        while (month === d.getMonth()) {
+          let date = {
+            year,
+            month,
+            date: d.getDate(),
+            day: d.getDay()
+          };
+          date.holiday = date.day === 0;
+          dates.push(date);
+          // Advance one day
+          d = new Date(d.getTime() + this._MS_ONE_DAY);
+        }
+        return dates;
       }
-      return { year, month, date };
-    }
 
-    convertJSDate2LocalDate(year, month, date) {
-      return this.convertLocalDate2JSDate(year, month, date);
+      convertLocalDate2JSDate(year, month, date) {
+        if (!this.isDateInCalendar(year, month, date)) {
+          return null;
+        }
+        return { year, month, date };
+      }
+
+      convertJSDate2LocalDate(year, month, date) {
+        return this.convertLocalDate2JSDate(year, month, date);
+      }
+
+      _isValidYear(y) {
+        // In JS Date, `00` ~ `99` means 1900 ~ 1999.
+        // To avoid confusion, we demand at least 100.
+        // This should be ok for the most cases.
+        // And if someone needed a year under 100,
+        // then we can build another calendar for that.
+        return caLINEdar.isInt(y) && y >= 100;
+      }
     }
+    _StandardCalendar = StandardCalendar;
   }
-
-  return new StandardCalendar();
+  return _StandardCalendar;
 }
 
-module.exports = createStandardCalender;
+function createStandardCalender(caLINEdar) {
+  let Calendar = getStandardCalenderClass(caLINEdar);
+  return new Calendar();
+}
+
+module.exports = { getStandardCalenderClass, createStandardCalender };

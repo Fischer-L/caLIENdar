@@ -1,6 +1,6 @@
 import testUtil from "./testUtil";
 import caLINEdar from "../src/caLINEdar";
-import createStandardCalender from "../src/StandardCalender";
+import { createStandardCalender } from "../src/StandardCalender";
 
 describe("StandardCalender", () => {
 
@@ -32,7 +32,7 @@ describe("StandardCalender", () => {
     expect(calender.getDateStringPlaceholder()).toBe("YYYY/MM/DD");
   });
 
-  it("should format date strings", () => {
+  it("should return date string format", () => {
     const dateFormats = [
       {
         date: [2018, 6, 6],
@@ -107,7 +107,6 @@ describe("StandardCalender", () => {
     let days = calender.getDays();
     expect(JSON.stringify(days)).toBe(JSON.stringify(expected));
   });
-
 
   it("should return dates", () => {
     let expected = [ 

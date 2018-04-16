@@ -90,7 +90,7 @@ describe("IranSolarHijriCalender", () => {
     expect(iranCalendar.isDateInCalendar(MAX_VALID_IRAN_YEAR, MAX_VALID_IRAN_MONTH, 30)).toBe(false);
   });
 
-  it("should format date strings", () => {
+  it("should return date string format", () => {
 
     const dateFormats = [
       {
