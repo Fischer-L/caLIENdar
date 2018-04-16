@@ -269,10 +269,6 @@ const caLINEdar = {
         cellCount: 4,
         rowCount: 3,
       });
-      [ ".caLINEdar-panel__btn.left-btn", 
-        ".caLINEdar-panel__btn.right-btn"].forEach(cls => {
-          this._monthPicker.querySelector(cls).style.display = "none";
-        });
       this._monthPicker.classList.add("caLINEdar-month-picker");
       this._calendar.appendChild(this._monthPicker);
     }
@@ -300,6 +296,12 @@ const caLINEdar = {
    *        - text {String} The title of this year
    *        - value {Integer} The data attribute value identifying this year
    *        - picked {bool} whether this year is picked
+   *
+   *    - noMoreLeft {bool} Optional. `true` means can't flip the year picker
+   *                        leftward any more so hide the left button. Default is `false`
+
+   *    - noMoreRight {bool} Optional. `true` means can't flip the year picker
+   *                         rightward any more so hide the right button. Default is `false`
    */
   showYearPicker(params) {
     if (!this.isCalendarOpen()) {
@@ -321,7 +323,7 @@ const caLINEdar = {
     this.closeMonthPicker();
     this._yearPicker.style.display = "";
     this._yearPicker.setAttribute("data-caLINEdar-value", params.value);
-    return this._updateYearPicker(params.years);
+    return this._updateYearPicker(params);
   },
 
   closeYearPicker() {
@@ -428,23 +430,39 @@ const caLINEdar = {
 
         let table = picker.querySelector(".caLINEdar-table");
         this._updateTableCells(table, months);
+
+        this._updatePanelButtons(picker, {
+          noMoreLeft: true, noMoreRight: true
+        });
         resolve();
       });
     });
   },
 
-  _updateYearPicker(years) {
+  _updateYearPicker(params) {
     return new Promise(resolve => {
       this._win.requestAnimationFrame(() => {
+        let { years } = params;
         let picker = this._yearPicker;
 
         let btn = picker.querySelector(".caLINEdar-panel__btn.picker-btn");
-        btn.textContent = years.find(y => y.picked).text;
+        let y0 = years[0].text;
+        let y1 = years[1].text;
+        btn.textContent = `${y0} ~ ${y1}`;
 
         let table = picker.querySelector(".caLINEdar-table");
         this._updateTableCells(table, years);
+        this._updatePanelButtons(picker, params);
+        resolve();
       });
     });
+  },
+
+  _updatePanelButtons(picker, params) {
+    picker.querySelector(".caLINEdar-panel__btn.left-btn")
+      .style.display = params.noMoreLeft === true ? "none" : "";
+    picker.querySelector(".caLINEdar-panel__btn.right-btn")
+      .style.display = params.noMoreRight === true ? "none" : "";
   },
 
   _createInput() {
