@@ -242,17 +242,19 @@ class CaLINEdarDateInput {
   }
 
   _onPick(picker, target) {
-    let value = this._unserializeValue(
-      target.getAttribute("data-caLINEdar-value"));
+    let value = target.getAttribute("data-caLINEdar-value");
     if (!value) {
       return;
     }
 
     switch (picker.id) {
       case this.caLINEdar.ID_DATE_PICKER:
+        value = this._unserializeValue(value);
+        
         let jsDate = this._calendar.convertLocalDate2JSDate(
           value.year, value.month, value.date);
         jsDate = new Date(jsDate.year, jsDate.month, jsDate.date);
+
         if (this.setDate(jsDate)) {
           // The date has changed so refresh the date picker
           this._showDatePicker(
@@ -262,6 +264,11 @@ class CaLINEdarDateInput {
           );
           this._notify("onChange");
         }
+        break;
+
+      case this.caLINEdar.ID_MONTH_PICKER:
+        value = this._unserializeValue(value);
+        this._showDatePicker(value.year, value.month, this._localDate);
         break;
     }
   }
@@ -349,9 +356,13 @@ class CaLINEdarDateInput {
     let months = this._calendar.getMonths(year);
     months = months.map(m => {
       m.picked = m.value === monthPicked;
+      m.value = this._serializeValue({
+        year,
+        month: m.value
+      });
       return m;
     });
-    let value = this._serializeValue({ month: monthPicked });
+    let value = this._serializeValue({ year, month: monthPicked });
     return {
       value,
       months
