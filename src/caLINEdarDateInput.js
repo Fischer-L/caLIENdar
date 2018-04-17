@@ -167,6 +167,15 @@ class CaLINEdarDateInput {
   // DOM events
 
   onFocus = e => {
+    if (caLINEdar.isSmallScreen()) {
+      // In a mobile device, usually focusing an input would
+      // bring up a virtual keyboard, which would break our calendar.
+      // So we have to force blur to prevent that.
+      // Here we do `blur` 2 times.
+      // A bit rude but making sure no virtual keyboard is important.
+      this.input.blur();
+      this._win.requestAnimationFrame(() => this.input.blur());
+    }
     if (this.caLINEdar.getCurrentDateInput() !== this) {
       this.caLINEdar.setCurrentDateInput(this);
       // Open in the next tick. Don't block the event.
@@ -194,10 +203,6 @@ class CaLINEdarDateInput {
   _onPickerClick = async e => {
     e.preventDefault();
     e.stopPropagation();
-
-    // When clicking outside the input,
-    // it will cause the calendar closed and the input loses focus.
-    await this._ensureFocus();
 
     let { picker, target } = e.detail;
 
@@ -450,29 +455,6 @@ class CaLINEdarDateInput {
       noMoreRight,
       rtl: this._rtl,
     };
-  }
-
-  async _ensureFocus() {
-    let refocus = () => {
-      this._win.requestAnimationFrame(() => this.input.focus());
-    };
-
-    if (this._win.document.activeElement === this.input) {
-      // The case that we are about to lose focus so stop it.
-      let stopBlur = () => {
-        this.input.removeEventListener("blur", stopBlur);
-        refocus();
-      };
-      this.input.addEventListener("blur", stopBlur);
-    } else {
-      // The case that we lose focus but we shouldn't.
-      if (!this.caLINEdar.isCalendarOpen()) {
-        // The calendar shouldn't be closed 
-        // so restore the calendar asap.
-        await this.openCalendar();
-      }
-      refocus();
-    }
   }
 
   _datesEqual(a, b) {
