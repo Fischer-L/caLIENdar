@@ -39,9 +39,10 @@
   },
   "scripts": {
     "build": "npm run clean && npm run copy_assets && cross-env NODE_ENV=production webpack",
-    "build-dev-watch": "npm run clean && npm run copy_assets && webpack --watch --info-verbosity verbose",
-    "clean": "rimraf ./dist",
+    "build-dev": "npm run clean && npm run copy_assets-dev && webpack --watch --info-verbosity verbose",
     "copy_assets": "copyfiles demo/*.html dist/demo -f",
+    "copy_assets-dev": "copyfiles demo/*.html devDist/demo -f",
+    "clean": "rimraf ./dist && rimraf ./devDist",
     "test": "jest"
   }
 }

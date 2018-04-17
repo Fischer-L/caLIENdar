@@ -4,7 +4,7 @@ const production = process.env.NODE_ENV === "production";
 const options = {};
 
 options.webpackMode = production ? "production" : "development";
-options.outputName = production ? "[name].bundle.js" : "[name].dev.bundle.js";
+options.outputDir = production ? "dist" : "devDist";
 
 module.exports = {
   entry: {
@@ -13,8 +13,8 @@ module.exports = {
   },
   
   output: {
-    path: path.resolve(__dirname, "dist"),
-    filename: options.outputName,
+    path: path.resolve(__dirname, options.outputDir),
+    filename: "[name].bundle.js",
   },
 
   mode: options.webpackMode,

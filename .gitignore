@@ -1,7 +1,6 @@
 .DS_Store
 
-dist/*.dev.*
-dist/**/*.dev.*
+devDist
 
 # Logs
 logs

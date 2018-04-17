@@ -78,10 +78,6 @@ const caLINEdar = {
     return this._dateInput || null;
   },
 
-  isLeapYear(year) {
-    return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
-  },
-
   /**
    * @return {Date} A JS Date object meaning right now in the local time
    */
