@@ -569,6 +569,7 @@ const caLINEdar = {
       let cells = row.querySelectorAll(".caLINEdar-table-cell");
       for (let j = 0; j < cellCount; ++j) {
         let cell = cells[j];
+        cell.textContent = "";
         cell.classList.remove("picked");
         cell.classList.remove("active");
         cell.classList.remove("special");
