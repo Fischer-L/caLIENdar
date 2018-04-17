@@ -22,8 +22,6 @@ const caLINEdar = {
    *    - mountElem {HTMLElement} The element where the input element sits. 
    *                              One input element will be created for you so don't pass another one.
    *
-   *    - The parameters for constructing `CaLINEdarDateInput` so please refer to that.
-   *
    *    - calendar {*} If not given, will use the standard calendar. See `CaLINEdarDateInput`.
    *    - date {*} See `CaLINEdarDateInput`.
    *    - event types {*} See `CaLINEdarDateInput`.
