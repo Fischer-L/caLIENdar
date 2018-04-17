@@ -168,6 +168,7 @@ class CaLINEdarDateInput {
 
   onFocus = e => {
     if (caLINEdar.isSmallScreen()) {
+      this.input.blur();
       this._win.requestAnimationFrame(() => this.input.blur());
     }
     if (this.caLINEdar.getCurrentDateInput() !== this) {
