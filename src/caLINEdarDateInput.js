@@ -4,7 +4,8 @@ class CaLINEdarDateInput {
   /**
    * @param params {Object}
    *    The params provided by users
-   *    - calendar {CaLINEdarCalender} The calendar so we can get dates to pick
+   *    - calendar {CaLINEdarCalender} The calendar extends `CaLINEdarCalender` so we can get dates to pick
+   *    - rtl {bool} Optional. `true` for the RTL mode. Default is `false`
    *    - date {*} Optional. See `setDate`
    *    - event types {Function} Optional. The events to subscribe. See `subscribe` for events.
    *
@@ -18,6 +19,7 @@ class CaLINEdarDateInput {
    */
   constructor(params) {
     let {
+      rtl,
       date,
       input,
       calendar,
@@ -29,6 +31,7 @@ class CaLINEdarDateInput {
 
     this._win = params.window;
     this._calendar = calendar;
+    this._rtl = !!rtl;
     this._events = {};
 
     if (!this.setDate(date)) {
@@ -305,9 +308,8 @@ class CaLINEdarDateInput {
   }
 
   _flipDatePicker(year, month, dir) {
-    // TODO: utilize `dir` to do RTL
     let months = this._calendar.getMonths(year);
-    let next = dir === "right";
+    let next = this._rtl ? dir === "left" : dir === "right";
     let target = next ? 
       this._calcNextLocalMonth(year, month, months) :
       this._calcPrevLocalMonth(year, month, months);
@@ -356,6 +358,7 @@ class CaLINEdarDateInput {
       weekHeaders,
       noMoreLeft,
       noMoreRight,
+      rtl: this._rtl,
     };
   }
 

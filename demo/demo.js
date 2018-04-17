@@ -23,6 +23,7 @@ window.thaiDateInput = caLINEdar.createDateInput({
 let iranCalendar = createIranSolarHijriCalender(caLINEdar);
 let iranDatePicker = document.querySelector("#iranian-date-picker");
 window.iranDateInput = caLINEdar.createDateInput({
+  rtl: true,
   date: new Date(),
   calendar: iranCalendar,
   mountElem: iranDatePicker,

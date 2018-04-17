@@ -22,7 +22,8 @@ const caLINEdar = {
    *    - mountElem {HTMLElement} The element where the input element sits. 
    *                              One input element will be created for you so don't pass another one.
    *
-   *    - calendar {*} If not given, will use the standard calendar. See `CaLINEdarDateInput`.
+   *    - calendar {*} If not given, will use the standard calendar. See `CaLINEdarDateInput` for more.
+   *    - rtl {*} See `CaLINEdarDateInput`.
    *    - date {*} See `CaLINEdarDateInput`.
    *    - event types {*} See `CaLINEdarDateInput`.
    *
@@ -155,6 +156,8 @@ const caLINEdar = {
    * @param params {Object} The parameters are:
    *    - value {String} The data attribute value identifing year and month
    *
+   *    - rtl {bool} Optional. `true` for the RTL mode. Default is `false`
+   *
    *    - pickerBtns {Array} represent the buttons on the top of the picker.
    *                         Each button should contains
    *                         - text {String} the button title
@@ -175,7 +178,7 @@ const caLINEdar = {
    *
    *    - noMoreLeft {bool} Optional. `true` means can't flip the year picker
    *                        leftward any more so hide the left button. Default is `false`
-
+   *
    *    - noMoreRight {bool} Optional. `true` means can't flip the year picker
    *                         rightward any more so hide the right button. Default is `false`
    */
@@ -216,7 +219,7 @@ const caLINEdar = {
   /**
    * @param params {Object} The parameters are:
    *    - value {String} The data attribute value identifing year
-
+   *
    *    - months {Array} 
    *        An array (count is `MAX_COUNT_MONTHS_IN_MONTH_PICKER`) of months to display.
    *        Each month is an object with:
@@ -365,7 +368,7 @@ const caLINEdar = {
   async _updateDatePicker(params) {
     return new Promise(resolve => {
       this._win.requestAnimationFrame(() => {
-        let { pickerBtns, weekHeaders, dates } = params;
+        let { pickerBtns, weekHeaders, dates, rtl } = params;
         let picker = this._datePicker;
 
         let btns = picker.querySelectorAll(".caLINEdar-panel__btn.picker-btn");
@@ -377,11 +380,14 @@ const caLINEdar = {
         let table = picker.querySelector(".caLINEdar-table");
         let headers = table.querySelector(".caLINEdar-table-headers")
                            .querySelectorAll(".caLINEdar-table-cell");
+        if (rtl) {
+          weekHeaders = weekHeaders.slice().reverse();
+        }
         for (let i = 0; i < headers.length; ++i) {
           headers[i].textContent = weekHeaders[i];
         }
 
-        this._updateTableCells(table, dates);
+        this._updateTableCells(table, dates, rtl);
         this._updatePanelButtons(picker, params);
         resolve();
       });
@@ -537,7 +543,7 @@ const caLINEdar = {
     return tr;
   },
 
-  _updateTableCells(table, values) {
+  _updateTableCells(table, values, rtl) {
     let rows = table.querySelectorAll(".caLINEdar-table-values");
     let cellCount = rows[0].querySelectorAll(".caLINEdar-table-cell").length;
 
@@ -546,6 +552,9 @@ const caLINEdar = {
       let data = [];
       for (let j = 0; j < cellCount; ++j, ++i) {
         data.push(values[i] || null);
+      }
+      if (rtl) {
+        data.reverse();
       }
       valuesByRows.push(data);
     }
