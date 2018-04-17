@@ -318,9 +318,9 @@ class CaLINEdarDateInput {
   }
 
   _flipYearPicker(anchorYear, anchorMonth, years, dir) {
-    // TODO: utilize `dir` to do RTL
-    dir = dir === "right" ? 1 : -1;
-    anchorYear = anchorYear + dir * years.length;
+    let factor = dir === "right" ? 1 : -1;
+    factor = this._rtl ? factor * -1 : factor;
+    anchorYear = anchorYear + factor * years.length;
     this.caLINEdar.showYearPicker(this._getYearPickerParams(anchorYear, anchorMonth));
   }
 
@@ -348,6 +348,9 @@ class CaLINEdarDateInput {
     let next = this._calcNextLocalMonth(year, month, months);
     let noMoreLeft = !calendar.isDateInCalendar(prev.year, prev.month);
     let noMoreRight = !calendar.isDateInCalendar(next.year, next.month);
+    if (this._rtl) {
+      [ noMoreRight, noMoreLeft] = [ noMoreLeft, noMoreRight ];
+    }
 
     let value = this._serializeValue({ year, month });
     let dates = this._getLocalDatesToDisplay(year, month, datePicked);
@@ -396,6 +399,9 @@ class CaLINEdarDateInput {
 
     let noMoreLeft = !this._calendar.isDateInCalendar(years[0] - 1);
     let noMoreRight = !this._calendar.isDateInCalendar(years[COUNT - 1] + 1);
+    if (this._rtl) {
+      [ noMoreRight, noMoreLeft] = [ noMoreLeft, noMoreRight ];
+    }
 
     // Remove years not in the calendar
     years = years.filter(y => this._calendar.isDateInCalendar(y));
@@ -417,6 +423,7 @@ class CaLINEdarDateInput {
       years,
       noMoreLeft,
       noMoreRight,
+      rtl: this._rtl,
     };
   }
 

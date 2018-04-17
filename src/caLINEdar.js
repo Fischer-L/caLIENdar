@@ -263,6 +263,8 @@ const caLINEdar = {
    * @param params {Object} The parameters are:
    *    - value {String} The data attribute value identifing year
    *
+   *    - rtl {bool} Optional. `true` for the RTL mode. Default is `false`
+   *
    *    - months {Array} 
    *        An array (count is `MAX_COUNT_YEAR_IN_YEAR_PICKER`) of years to display.
    *        Each year is an object with:
@@ -417,7 +419,7 @@ const caLINEdar = {
   _updateYearPicker(params) {
     return new Promise(resolve => {
       this._win.requestAnimationFrame(() => {
-        let { years } = params;
+        let { years, rtl } = params;
         let picker = this._yearPicker;
 
         let btn = picker.querySelector(".caLINEdar-panel__btn.picker-btn");
@@ -426,7 +428,7 @@ const caLINEdar = {
         btn.textContent = `${y0} ~ ${y1}`;
 
         let table = picker.querySelector(".caLINEdar-table");
-        this._updateTableCells(table, years);
+        this._updateTableCells(table, years, rtl);
         this._updatePanelButtons(picker, params);
         resolve();
       });
