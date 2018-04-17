@@ -167,6 +167,9 @@ class CaLINEdarDateInput {
   // DOM events
 
   onFocus = e => {
+    if (caLINEdar.isSmallScreen()) {
+      this._win.requestAnimationFrame(() => this.input.blur());
+    }
     if (this.caLINEdar.getCurrentDateInput() !== this) {
       this.caLINEdar.setCurrentDateInput(this);
       // Open in the next tick. Don't block the event.
@@ -195,9 +198,11 @@ class CaLINEdarDateInput {
     e.preventDefault();
     e.stopPropagation();
 
-    // When clicking outside the input,
-    // it will cause the calendar closed and the input loses focus.
-    await this._ensureFocus();
+    if (!this.isSmallScreen()) {
+      // When clicking outside the input,
+      // it will cause the calendar closed and the input loses focus.
+      // await this._ensureFocus();
+    }
 
     let { picker, target } = e.detail;
 

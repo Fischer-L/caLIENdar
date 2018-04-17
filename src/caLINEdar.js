@@ -111,6 +111,16 @@ const caLINEdar = {
     return (x | 0) === x;
   },
 
+  isSmallScreen() {
+    // Why not using @media in CSS?
+    // 1. We must stop `_positionCalendarOnBigScreen` in js
+    // 2. Our other js part need it as well
+    // 3. To reduce the duplicate media query rules in JS and CSS,
+    // let's test media condition and control styles by CSS selector in JS.
+    let media = "(max-width: 768px)"; // 768px is iPad
+    return this._win.matchMedia(media).matches;
+  },
+
   isCalendarOpen() {
     return this._calendar && this._calendar.hasAttribute("data-caLINEdar-opened");
   },
@@ -694,16 +704,6 @@ const caLINEdar = {
     }
   },
 
-  _isSmallScreen() {
-    // Why not using @media in CSS?
-    // We must stop `_positionCalendarOnBigScreen` in js,
-    // so matching media here is required.
-    // To reduce the duplicate media query rules in JS and CSS,
-    // let's test media condition and control styles by CSS selector in JS.
-    let media = "(max-width: 768px)"; // 768px is iPad
-    return this._win.matchMedia(media).matches;
-  },
-
   _positionCalendarOnSmallScreen() {
     this._mobileBackground.style.display = "";
     this._calendar.classList.add("small-screen");
@@ -759,7 +759,7 @@ const caLINEdar = {
     }
     return new Promise(resolve => {
       this._win.requestAnimationFrame(() => {
-        if (this._isSmallScreen()) {
+        if (this.isSmallScreen()) {
           this._positionCalendarOnSmallScreen();
         } else {
           this._positionCalendarOnBigScreen(anchorInput);
