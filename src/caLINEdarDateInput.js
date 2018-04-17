@@ -375,7 +375,8 @@ class CaLINEdarDateInput {
     let value = this._serializeValue({ year, month: monthPicked });
     return {
       value,
-      months
+      months,
+      rtl: this._rtl,
     };
   }
 

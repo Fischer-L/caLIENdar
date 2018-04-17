@@ -220,6 +220,8 @@ const caLINEdar = {
    * @param params {Object} The parameters are:
    *    - value {String} The data attribute value identifing year
    *
+   *    - rtl {bool} Optional. `true` for the RTL mode. Default is `false`
+   *
    *    - months {Array} 
    *        An array (count is `MAX_COUNT_MONTHS_IN_MONTH_PICKER`) of months to display.
    *        Each month is an object with:
@@ -247,7 +249,7 @@ const caLINEdar = {
     this.closeYearPicker();
     this._monthPicker.style.display = "";
     this._monthPicker.setAttribute("data-caLINEdar-value", params.value);
-    return this._updateMonthPicker(params.months);
+    return this._updateMonthPicker(params.months, params.rtl);
   },
 
   closeMonthPicker() {
@@ -394,7 +396,7 @@ const caLINEdar = {
     });
   },
 
-  _updateMonthPicker(months) {
+  _updateMonthPicker(months, rtl) {
     return new Promise(resolve => {
       this._win.requestAnimationFrame(() => {
         let picker = this._monthPicker;
@@ -402,7 +404,7 @@ const caLINEdar = {
         btn.textContent = months.find(m => m.picked).text;
 
         let table = picker.querySelector(".caLINEdar-table");
-        this._updateTableCells(table, months);
+        this._updateTableCells(table, months, rtl);
 
         this._updatePanelButtons(picker, {
           noMoreLeft: true, noMoreRight: true
