@@ -5,10 +5,17 @@ import createIranSolarHijriCalender from "../src/IranSolarHijriCalender";
 caLINEdar.init(window);
 window.caLINEdar = caLINEdar;
 
+function getChangeHandler(elem) {
+  return function (dateInput) {
+    let picked = elem.querySelector(".current-picked");
+    picked.textContent = dateInput.getDate() || "-------";
+  }
+}
+
 let twDatePicker = document.querySelector("#tw-date-picker");
 window.twDateInput = caLINEdar.createDateInput({
   mountElem: twDatePicker,
-  onChange: inp => console.log("iranDateInput onChange", inp.getDate())
+  onChange: getChangeHandler(twDatePicker)
 });
 
 let thaiCalendar = createThaiCalender(caLINEdar);
@@ -17,7 +24,7 @@ window.thaiDateInput = caLINEdar.createDateInput({
   date: Math.floor((new Date(2016, 9, 17)).getTime() / 1000),
   calendar: thaiCalendar,
   mountElem: thaiDatePicker,
-  onChange: inp => console.log("thaiDatePicker onChange", inp.getDate())
+  onChange: getChangeHandler(thaiDatePicker)
 });
 
 let iranCalendar = createIranSolarHijriCalender(caLINEdar);
@@ -27,6 +34,6 @@ window.iranDateInput = caLINEdar.createDateInput({
   date: new Date(),
   calendar: iranCalendar,
   mountElem: iranDatePicker,
-  onChange: inp => console.log("iranDateInput onChange", inp.getDate())
+  onChange: getChangeHandler(iranDatePicker)
 });
 
