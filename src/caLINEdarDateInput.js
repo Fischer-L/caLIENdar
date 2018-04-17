@@ -209,34 +209,46 @@ class CaLINEdarDateInput {
   _onPanelButtonClick(picker, target) {
     let value = this._unserializeValue(
       picker.getAttribute("data-caLINEdar-value"));
-    switch (picker.id) {
-      case this.caLINEdar.ID_DATE_PICKER:
-        if (target.classList.contains("left-btn")) {
-          this._flipDatePicker(value.year, value.month, "left");
-          return;
-        }
-        if (target.classList.contains("right-btn")) {
-          this._flipDatePicker(value.year, value.month, "right");
-          return;
-        }
 
-        let btnValue = target.getAttribute("data-caLINEdar-value");
-        if (btnValue === "year-picker-btn") {
+    // Is Clicking on a year/month-picking button?
+    let btnValue = target.getAttribute("data-caLINEdar-value");
+    switch (btnValue) {
+      case "year-picker-btn":
+        if (picker.id !== this.caLINEdar.ID_YEAR_PICKER) {
           this._showYearPicker(value.year, value.month);
           return;
         }
-        if (btnValue === "month-picker-btn") {
+        break;
+
+      case "month-picker-btn":
+        if (picker.id !== this.caLINEdar.ID_MONTH_PICKER) {
           this._showMonthPicker(value.year, value.month);
+          return;
+        }
+        break;
+    }
+
+    // Is going left or right?
+    let goLeft = target.classList.contains("left-btn");
+    let goRight = target.classList.contains("right-btn");
+    switch (picker.id) {
+      case this.caLINEdar.ID_DATE_PICKER:
+        if (goLeft) {
+          this._flipDatePicker(value.year, value.month, "left");
+          return;
+        }
+        if (goRight) {
+          this._flipDatePicker(value.year, value.month, "right");
           return;
         }
         break;
 
       case this.caLINEdar.ID_YEAR_PICKER:
-        if (target.classList.contains("left-btn")) {
+        if (goLeft) {
           this._flipYearPicker(value.anchorYear, value.anchorMonth, value.years, "left");
           return;
         }
-        if (target.classList.contains("right-btn")) {
+        if (goRight) {
           this._flipYearPicker(value.anchorYear, value.anchorMonth, value.years, "right");
           return;
         }
@@ -324,9 +336,8 @@ class CaLINEdarDateInput {
     this.caLINEdar.showYearPicker(this._getYearPickerParams(anchorYear, anchorMonth));
   }
 
-  _getDatePickerParams(year, month, datePicked) {
-    let calendar = this._calendar;
-    let format = calendar.getDateStringFormat(year, month);
+  _getPickerBtnsParams(year, month) {
+    let format = this._calendar.getDateStringFormat(year, month);
     let pickerBtns = [];
     pickerBtns.push({
       text: format.year.text,
@@ -339,7 +350,12 @@ class CaLINEdarDateInput {
     if (format.year.pos > format.month.pos) {
       pickerBtns.reverse();
     }
+    return pickerBtns;
+  }
 
+  _getDatePickerParams(year, month, datePicked) {
+    let calendar = this._calendar;
+    let pickerBtns = this._getPickerBtnsParams(year, month);
     let days = calendar.getDays();
     let weekHeaders = days.map(d => d.text);
 
@@ -368,18 +384,21 @@ class CaLINEdarDateInput {
   _getMonthPickerParams(year, monthPicked) {
     let months = this._calendar.getMonths(year);
     months = months.map(m => {
-      m.picked = m.value === monthPicked;
       m.value = this._serializeValue({
         year,
         month: m.value
       });
       return m;
     });
+    let pickerBtns = this._getPickerBtnsParams(year, monthPicked);
     let value = this._serializeValue({ year, month: monthPicked });
     return {
       value,
       months,
+      pickerBtns,
       rtl: this._rtl,
+      noMoreLeft: true,
+      noMoreRight: true,
     };
   }
 

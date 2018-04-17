@@ -222,12 +222,24 @@ const caLINEdar = {
    *
    *    - rtl {bool} Optional. `true` for the RTL mode. Default is `false`
    *
+   *    - pickerBtns {Array} represent the buttons on the top of the picker.
+   *                         Each button should contains
+   *                         - text {String} the button title
+   *                         - value {String} the data attribute value for this button,
+   *                           which will be used to identify this button when clicking.
+   *
    *    - months {Array} 
    *        An array (count is `MAX_COUNT_MONTHS_IN_MONTH_PICKER`) of months to display.
    *        Each month is an object with:
    *        - text {String} The title of this month
    *        - value {Integer} The data attribute value identifying this month
    *        - picked {bool} whether this month is picked
+   *
+   *    - noMoreLeft {bool} Optional. `true` means can't flip the year picker
+   *                        leftward any more so hide the left button. Default is `false`
+   *
+   *    - noMoreRight {bool} Optional. `true` means can't flip the year picker
+   *                         rightward any more so hide the right button. Default is `false`
    */
   showMonthPicker(params) {
     if (!this.isCalendarOpen()) {
@@ -237,7 +249,7 @@ const caLINEdar = {
     if (!this._monthPicker) {
       this._monthPicker = this._createEmptyPicker({
         id: this.ID_MONTH_PICKER,
-        pickerBtnCount: 1,
+        pickerBtnCount: 2,
         headerCount: 0,
         cellCount: 4,
         rowCount: 3,
@@ -249,7 +261,7 @@ const caLINEdar = {
     this.closeYearPicker();
     this._monthPicker.style.display = "";
     this._monthPicker.setAttribute("data-caLINEdar-value", params.value);
-    return this._updateMonthPicker(params.months, params.rtl);
+    return this._updateMonthPicker(params);
   },
 
   closeMonthPicker() {
@@ -375,12 +387,6 @@ const caLINEdar = {
         let { pickerBtns, weekHeaders, dates, rtl } = params;
         let picker = this._datePicker;
 
-        let btns = picker.querySelectorAll(".caLINEdar-panel__btn.picker-btn");
-        for (let i = 0; i < pickerBtns.length; ++i) {
-          btns[i].textContent = pickerBtns[i].text;
-          btns[i].setAttribute("data-caLINEdar-value", pickerBtns[i].value);
-        }
-
         let table = picker.querySelector(".caLINEdar-table");
         let headers = table.querySelector(".caLINEdar-table-headers")
                            .querySelectorAll(".caLINEdar-table-cell");
@@ -398,19 +404,14 @@ const caLINEdar = {
     });
   },
 
-  _updateMonthPicker(months, rtl) {
+  _updateMonthPicker(params) {
     return new Promise(resolve => {
       this._win.requestAnimationFrame(() => {
+        let { months, rtl } = params;
         let picker = this._monthPicker;
-        let btn = picker.querySelector(".caLINEdar-panel__btn.picker-btn");
-        btn.textContent = months.find(m => m.picked).text;
-
         let table = picker.querySelector(".caLINEdar-table");
         this._updateTableCells(table, months, rtl);
-
-        this._updatePanelButtons(picker, {
-          noMoreLeft: true, noMoreRight: true
-        });
+        this._updatePanelButtons(picker, params);
         resolve();
       });
     });
@@ -436,10 +437,17 @@ const caLINEdar = {
   },
 
   _updatePanelButtons(picker, params) {
+    let { pickerBtns, noMoreLeft, noMoreRight } = params;
+    let btns = picker.querySelectorAll(".caLINEdar-panel__btn.picker-btn");
+    for (let i = 0; pickerBtns && i < pickerBtns.length; ++i) {
+      btns[i].textContent = pickerBtns[i].text;
+      btns[i].setAttribute("data-caLINEdar-value", pickerBtns[i].value);
+    }
+
     picker.querySelector(".caLINEdar-panel__btn.left-btn")
-      .style.display = params.noMoreLeft === true ? "none" : "";
+      .style.display = !!noMoreLeft ? "none" : "";
     picker.querySelector(".caLINEdar-panel__btn.right-btn")
-      .style.display = params.noMoreRight === true ? "none" : "";
+      .style.display = !!noMoreRight ? "none" : "";
   },
 
   _createInput() {
