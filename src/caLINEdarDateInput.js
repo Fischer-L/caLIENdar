@@ -192,6 +192,17 @@ class CaLINEdarDateInput {
   // caLINEdar events
 
   _onClickOutside = e => {
+    // Currently we don't handle key inputs.
+    // In case the value is changed by key inputs.
+    // Before closing, let's set the date again
+    // to make sure the date correct.
+    // TODO: It is good to support key inputs.
+    // However for the schedule and scope,
+    // we cannot make everything done in the 1st version.
+    // Mark a TODO here to remind us this for the next version.
+    if (!this.setDate(this._unixDate)) {
+      this.clearDate();
+    }
     this.caLINEdar.closeCalendar();
   }
 
