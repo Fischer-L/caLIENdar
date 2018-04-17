@@ -705,6 +705,8 @@ const caLINEdar = {
   },
 
   _positionCalendarOnSmallScreen() {
+    this._calendar.style.top = "";
+    this._calendar.style.left = "";
     this._mobileBackground.style.display = "";
     this._calendar.classList.add("small-screen");
   },
