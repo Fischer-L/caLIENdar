@@ -44,6 +44,7 @@ class CaLINEdarDateInput {
 
     input.addEventListener("focus", this.onFocus);
     input.addEventListener(caLINEdar.EVENT_PICKER_CLICK, this._onPickerClick);
+    input.addEventListener(caLINEdar.EVENT_CLICK_CLEAR_BUTTON, this._onClearBtnClick);
     input.addEventListener(caLINEdar.EVENT_CLICK_OUTSIDE_PICKER, this._onClickOutside);
   }
 
@@ -183,6 +184,11 @@ class CaLINEdarDateInput {
 
   _onClickOutside = e => {
     this.caLINEdar.closeCalendar();
+  }
+
+  _onClearBtnClick = e => {
+    this.clearDate();
+    this._notify("onChange");
   }
   
   _onPickerClick = async e => {

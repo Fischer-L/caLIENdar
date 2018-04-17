@@ -38,7 +38,8 @@ const caLINEdar = {
       throw new Error(`Must provide a mounting element to mount the date input`);
     }
 
-    let input = this._createInput();
+    let inputModule = this._createInputModule();
+    let input = inputModule.querySelector(".caLINEdar-input");
     let dateInputParams = Object.assign({}, params, { 
       input, 
       caLINEdar: this,
@@ -52,11 +53,15 @@ const caLINEdar = {
     }
     delete dateInputParams.mountElem; // Delete unnecessary params
     let dateInput = new this.CaLINEdarDateInput(dateInputParams);
-    mountElem.appendChild(input);
+    dateInput.input = input;
+    mountElem.appendChild(inputModule);
     return dateInput;
   },
 
   /**
+   * This set one current associated dateInput.
+   * Our calnedar table will be positioned and display dates for that dateInput
+   *
    * @param dateInput {CaLINEdarDateInput} the `dateInput` to set as the current one
    */
   setCurrentDateInput(dateInput) {
@@ -327,6 +332,7 @@ const caLINEdar = {
   ID_YEAR_PICKER: "caLINEdar-year-picker",
 
   EVENT_PICKER_CLICK: "caLINEdar-on-picker-click",
+  EVENT_CLICK_CLEAR_BUTTON: "caLINEdar-on-clear-click",
   EVENT_CLICK_OUTSIDE_PICKER: "caLINEdar-on-click-outside",
 
   MAX_COUNT_YEAR_IN_YEAR_PICKER: 9,
@@ -335,13 +341,27 @@ const caLINEdar = {
 
   // Events
 
-  _onClick(e) {
-    if (!this._dateInput || !this.isCalendarOpen() ) {
+  _onClick(e) { 
+    let { target } = e;
+
+    if (target.classList.contains("caLINEdar-input-clear-btn")) {
+      // This should go with any input, why? For example,
+      // there is an input which user never opens the calendar on it.
+      // But that input has a default date.
+      // When a user clicks a clear button, s/he demands *clear*.
+      // So no matter the calendar was opened or any associated input.
+      // We should let that input know *A user want to clear value*
+      let inputHolder = target.parentNode;
+      let input = inputHolder.querySelector(".caLINEdar-input");
+      this._notifyInput(this.EVENT_CLICK_CLEAR_BUTTON, input);
+      return;
+    }
+
+    if (!this._dateInput || !this.isCalendarOpen()) {
       // If the calendar was closed or no date input,
       // nowhere has to do with us.
       return;
     }
-    let { target } = e;
 
     if (target === this._dateInput.input) {
       // User is clicking on the input.
@@ -369,13 +389,24 @@ const caLINEdar = {
 
   _notifyDateInput(eventType, detail) {
     if (this._dateInput) {
+      // Why a `_notifyDateInput` and another `_notifyInput`?
+      // `_notifyDateInput` notifies the current inpuf of `_dateInput`.
+      // `_notifyInput` servers a general purpose, which notify
+      // an input element. To distinguish the difference of the purpose,
+      // we make these 2 methods. Might be a bit bothersome but clear for codes.
+      this._notifyInput(eventType, this._dateInput.input, detail);
+    }
+  },
+
+  _notifyInput(eventType, input, detail) {
+    if (input) {
       // Why a custom event here?
       // Because we want to keep event communications
       // between caLINEdar and date input in private.
       // With the custom event, date input can listen to events 
       // without exposing any public APIs.
       let evt = new CustomEvent(eventType, { detail });
-      this._dateInput.input.dispatchEvent(evt);
+      input.dispatchEvent(evt);
     }
   },
 
@@ -450,13 +481,23 @@ const caLINEdar = {
       .style.display = !!noMoreRight ? "none" : "";
   },
 
-  _createInput() {
-    if (!this._inputTemplate) {
-      this._inputTemplate = this._doc.createElement("input");
-      this._inputTemplate.classList.add("caLINEdar-input");
-      this._inputTemplate.type = "text";
+  /**
+   * An input module looks like below:
+   * <div class="caLINEdar-input-holder">
+   *   <input class="caLINEdar-input" type="text">
+   *   <button class="caLINEdar-input-clear-btn"></button>
+   * </div>
+   */
+  _createInputModule() {
+    if (!this._inputModuleTemplate) {
+      this._inputModuleTemplate = this._doc.createElement("div");
+      this._inputModuleTemplate.classList.add("caLINEdar-input-holder");
+      this._inputModuleTemplate.innerHTML = `
+        <input class="caLINEdar-input" type="text">
+        <button class="caLINEdar-input-clear-btn"></button>
+      `;
     }
-    return this._inputTemplate.cloneNode(false);
+    return this._inputModuleTemplate.cloneNode(true);
   },
 
   /**
