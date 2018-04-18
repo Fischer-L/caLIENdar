@@ -521,11 +521,29 @@ class CaLINEdarDateInput {
     };
   }
 
+  // It may cost a bit that calendar calculates dates
+  // so we cache dates here.
+  _getDatesWithCache(year, month) {
+    let cache = this._datesCache;
+    if (!cache) {
+      cache = this._datesCache = {};
+    }
+    if (!cache[year]) {
+      cache[year] = {};
+    }
+    let dates = cache[year][month];
+    if (dates === undefined) {
+      cache[year][month]
+        = dates = this._calendar.getDates(year, month);
+    }
+    return dates && dates.map(d => Object.assign({}, d));
+  }
+
   _getLocalDatesToDisplay(year, month, datePicked) {
     let calendar = this._calendar;
     let days = calendar.getDays();
     let months = calendar.getMonths(year);
-    let dates = calendar.getDates(year, month);
+    let dates = this._getDatesWithCache(year, month);
   
     // For example maybe the 1st date is on Wed.
     // Then we are having 3 empty dates in the start
@@ -534,7 +552,7 @@ class CaLINEdarDateInput {
     let prevDates = null;
     if (emptyCountInStart > 0) {
       let prev = this._calcPrevLocalMonth(year, month, months);
-      prevDates = calendar.getDates(prev.year, prev.month);
+      prevDates = this._getDatesWithCache(prev.year, prev.month);
     }
     if (prevDates) {
       for (let i = prevDates.length - 1; emptyCountInStart > 0;) {
@@ -556,7 +574,7 @@ class CaLINEdarDateInput {
     let nextDates = null;
     if (emptyCountInTail > 0) {
       let next = this._calcNextLocalMonth(year, month, months);
-      nextDates = calendar.getDates(next.year, next.month);
+      nextDates = this._getDatesWithCache(next.year, next.month);
     }
     if (nextDates) {
       for (let i = 0; emptyCountInTail > 0;) {
