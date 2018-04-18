@@ -8,7 +8,7 @@ options.outputDir = production ? "dist" : "devDist";
 
 module.exports = {
   entry: {
-   "demo/demo": "./demo/demo.js"
+   "demo/demo": "./src/demo/demo.js"
   },
   
   output: {

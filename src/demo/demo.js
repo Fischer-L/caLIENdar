@@ -1,6 +1,6 @@
-import caLINEdar from "../src/index";
-import createThaiCalender from "../src/ThaiCalender";
-import createIranSolarHijriCalender from "../src/IranSolarHijriCalender";
+import caLINEdar from "../index";
+import createThaiCalender from "../ThaiCalender";
+import createIranSolarHijriCalender from "../IranSolarHijriCalender";
 
 caLINEdar.init(window);
 window.caLINEdar = caLINEdar;

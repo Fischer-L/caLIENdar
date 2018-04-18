@@ -235,7 +235,7 @@ function createIranSolarHijriCalender(caLINEdar) {
 
       let m = IRAN_MONTH_MAP.get(month);
       if (m) {
-        m = "" + m.text;
+        m = m.text;
       }
 
       let d = date;

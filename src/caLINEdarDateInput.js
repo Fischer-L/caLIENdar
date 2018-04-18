@@ -94,7 +94,7 @@ class CaLINEdarDateInput {
       newDate.getDate()
     );
     if (!local) {
-      // Don't throw because not a big idea that unable to set a date.
+      // Don't throw because not a big deal that unable to set a date.
       // However to throw may cause apps go broken down,
       // we don't want our user unable to use the rest of app.
       // But still warn about this case.
@@ -161,7 +161,7 @@ class CaLINEdarDateInput {
    * @param eventType {Stirng} The event type
    * @param handler {Functoin}
    *    The event handler. 
-   *    When invoked, this CaLINEdarDateInput instance will be pass in.
+   *    When invoked, this CaLINEdarDateInput instance will be passed in.
    */
   subscribe(eventType, handler) {
     if (!this._validEventTypes) {
@@ -213,10 +213,14 @@ class CaLINEdarDateInput {
   // caLINEdar events
 
   _onClickOutside = e => {
+    e.preventDefault();
+    e.stopPropagation();
     this.closeCalendar();
   }
 
   _onClearBtnClick = e => {
+    e.preventDefault();
+    e.stopPropagation();
     this.clearDate();
     this._notify("onChange");
   }

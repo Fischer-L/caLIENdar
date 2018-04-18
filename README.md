@@ -11,16 +11,16 @@ Load dist/demo/demo.html on the latest Chrome or Firefox
 
 ## Features
 (development time)
-- Let a developer create and mount a date picker onto a assign element
+- Let a developer create and mount a date picker onto an assigned element
   - (0.5 days)
 
 - Let a developer get, set, initial the picked date in unix time
-  - (1 day)
+  - (0.5 day)
 
-- Let a developer subscribe the picked date hcange event
+- Let a developer subscribe the picked date change event
   - (0.5 days)
 
-- Let a developer unsubscribe the picked date hcange event
+- Let a developer unsubscribe the picked date change event
   - (0.5 days)
 
 - Let a developer able to chose from 3 built-in, Standard, Thai, Iranian, calendars
@@ -44,10 +44,10 @@ Load dist/demo/demo.html on the latest Chrome or Firefox
 - Let a visitor pick a date from the calendar
   - (1 days)
 
-- Let a visitor browser through years in the calendar
+- Let a visitor browse through years in the calendar
   - (1 days)
 
-- Let a visitor browser through months in the calendar
+- Let a visitor browse through months in the calendar
   - (1 days)
 
 - Let a visitor able to clear the date picked
@@ -168,7 +168,6 @@ const caLINEdar = {
 
   /**
    * This set one current associated dateInput.
-   * Our calnedar table will be positioned and display dates for that dateInput
    *
    * @param dateInput {CaLINEdarDateInput} the `dateInput` to set as the current one
    */
@@ -290,7 +289,7 @@ const caLINEdar = {
    *
    *    - noMoreLeft {bool} Optional. `true` means can't flip the year picker
    *                        leftward any more so hide the left button. Default is `false`
-
+   *
    *    - noMoreRight {bool} Optional. `true` means can't flip the year picker
    *                         rightward any more so hide the right button. Default is `false`
    */
@@ -416,8 +415,8 @@ class CaLINEdarDateInput {
 ### CaLINEdarCalender
 ```js
 /**
- * This abstract class reprensent a calendar providing dates to display.
- * You can entend this class to create your own local canlendar.
+ * This abstract class reprensents a calendar providing dates to display.
+ * You can extend this class to create your own local calendar.
  * This makes our caLINEdar display not only built-in calendar but also custom calendars.
  * Here you will hear 2 terms *js date* and *local date*. Each means:
  * - JS date simply means a date based on JS date mechanism.

@@ -89,15 +89,13 @@ const caLINEdar = {
     }
     delete dateInputParams.mountElem; // Delete unnecessary params
     let dateInput = new this.CaLINEdarDateInput(dateInputParams);
-    dateInput.input = input;
     mountElem.appendChild(inputModule);
     return dateInput;
   },
 
   /**
    * This set one current associated dateInput.
-   * Our calnedar table will be positioned and display dates for that dateInput
-   *
+   * 
    * @param dateInput {CaLINEdarDateInput} the `dateInput` to set as the current one
    */
   setCurrentDateInput(dateInput) {
@@ -175,7 +173,7 @@ const caLINEdar = {
    *                           which will be used to identify this button when clicking.
    *
    *    - weekHeaders {Array} The titles of days in a week (count is 7).
-   *                          The 1st one is displayed in the left-most.
+   *                          The 1st one is displayed as the 1st one.
    *
    *    - dates {Array} 
    *        An array (count is `MAX_COUNT_DATES_IN_DATE_PICKER`) of dates to display.
@@ -299,7 +297,7 @@ const caLINEdar = {
    *
    *    - noMoreLeft {bool} Optional. `true` means can't flip the year picker
    *                        leftward any more so hide the left button. Default is `false`
-
+   *
    *    - noMoreRight {bool} Optional. `true` means can't flip the year picker
    *                         rightward any more so hide the right button. Default is `false`
    */
@@ -361,7 +359,6 @@ const caLINEdar = {
     if (Number.isInteger) {
       return Number.isInteger(v);
     }
-    // OK We are seeing IE!?
     if (isNaN(v)) {
       return false;
     }
@@ -377,7 +374,7 @@ const caLINEdar = {
     // 1. We must stop `_positionCalendarOnBigScreen` in js
     // 2. Our other js part need it as well
     // 3. To reduce the duplicate media query rules in JS and CSS,
-    // let's test media condition and control styles by CSS selector in JS.
+    // let's test media condition in JS.
     let media = "(max-width: 768px)"; // 768px is iPad
     return this._win.matchMedia(media).matches;
   },
@@ -407,7 +404,7 @@ const caLINEdar = {
       // But that input has a default date.
       // When a user clicks a clear button, s/he demands *clear*.
       // So no matter the calendar was opened or any associated input.
-      // We should let that input know *A user want to clear value*
+      // We should let that input know *A user wants to clear value*
       let inputHolder = target.parentNode;
       let input = inputHolder.querySelector(".caLINEdar-input");
       this._notifyInput(this.EVENT_CLICK_CLEAR_BUTTON, input);
@@ -512,9 +509,11 @@ const caLINEdar = {
         let picker = this._yearPicker;
 
         let btn = picker.querySelector(".caLINEdar-panel__btn.picker-btn");
-        let y0 = years[0].text;
-        let y1 = years[1].text;
-        btn.textContent = `${y0} ~ ${y1}`;
+        let y = [ years[0].text, years[years.length-1].text ];
+        if (rtl) {
+          y.reverse();
+        }
+        btn.textContent = `${y[0]} ~ ${y[1]}`;
 
         let table = picker.querySelector(".caLINEdar-table");
         this._updateTableCells(table, years, rtl);
@@ -675,14 +674,15 @@ const caLINEdar = {
       let cells = row.querySelectorAll(".caLINEdar-table-cell");
       for (let j = 0; j < cellCount; ++j) {
         let cell = cells[j];
+        cell.removeAttribute("data-caLINEdar-value");
         cell.textContent = "";
         cell.classList.remove("picked");
         cell.classList.remove("active");
         cell.classList.remove("special");
         cell.classList.remove("gray-out-date");
         if (data && data[j]) {
-          cell.textContent = data[j].text; 
           cell.setAttribute("data-caLINEdar-value", data[j].value);
+          cell.textContent = data[j].text; 
           cell.classList.add("active");
           if (data[j].picked) {
             cell.classList.add("picked");
@@ -774,10 +774,10 @@ const caLINEdar = {
       calendarW = rect.width;
       calendarH = rect.height;
       this._calendar.setAttribute("data-caLINEdar-width", calendarW);
-      this._calendar.setAttribute("data-caLINEdar-height", calendarH)
+      this._calendar.setAttribute("data-caLINEdar-height", calendarH);
     }
 
-    // Unfortunately, we can't cache `anchorInput`
+    // Unfortunately, we can't do cache with `anchorInput`
     // because its dimesion may change, not in our control.
     let inputRect = anchorInput.getBoundingClientRect();
 

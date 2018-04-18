@@ -142,17 +142,22 @@ function createThaiCalender(caLINEdar) {
 
     getDateStringFormat(year, month, date) {
       let format = super.getDateStringFormat(this._toStandardYear(year), month, date);
-      if (format.year) {
-        format.year.text = "" + this._toBuddihstYear(format.year.text);
-      }
-      if (format.month) {
-        format.month.text = MONTH_MAP.get(month).text;
+      if (format) {
+        if (format.year) {
+          format.year.text = "" + this._toBuddihstYear(format.year.text);
+        }
+        if (format.month) {
+          format.month.text = MONTH_MAP.get(month).text;
+        } 
       }
       return format;
     }
 
     toLocaleDateString(jsDate) {
       let str = super.toLocaleDateString(jsDate);
+      if (!str) {
+        return "";
+      }
       str = str.split("/");
       str[0] = this._toBuddihstYear(str[0]);
       return str.join("/");

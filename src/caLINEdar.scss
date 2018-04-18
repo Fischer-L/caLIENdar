@@ -30,6 +30,7 @@ $caLINEdar-input-height: 2.8em;
 
 .caLINEdar-input {
   flex: 1;
+  width: calc(100% - 2px - #{$caLINEdar-input-height});
   height: $caLINEdar-input-height;
   padding: 0.2em 1.2em;
   border: 1px solid #ccc;
