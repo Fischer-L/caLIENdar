@@ -1,5 +1,9 @@
+/**
+ * This class controls the date input field element and provides lib users APIs
+ * to set, get, listen to date etc.
+ */
 class CaLINEdarDateInput {
-  // Public APIs
+  /* Public APIs */
 
   /**
    * @param params {Object}
@@ -126,6 +130,27 @@ class CaLINEdarDateInput {
   }
 
   /**
+   * Close the calendar
+   */
+  closeCalendar() {
+    if (this.caLINEdar.getCurrentDateInput() !== this) {
+      return;
+    }
+    // Currently we don't handle key inputs.
+    // In case the value is changed by key inputs.
+    // Before closing, let's set the date again
+    // to make sure the date correct.
+    // TODO: It is good to support key inputs.
+    // However for the schedule and scope,
+    // we cannot make everything done in the 1st version.
+    // Mark a TODO here to remind us this for the next version.
+    if (!this.setDate(this._unixDate)) {
+      this.clearDate();
+    }
+    this.caLINEdar.closeCalendar();
+  }
+
+  /**
    * Subscribe a event. The Valid events are:
    * - onChange: Called when the date picked is changed
    *
@@ -162,7 +187,7 @@ class CaLINEdarDateInput {
     }
   }
 
-  // Public APIs end
+  /* Public APIs End */
 
   // DOM events
 
@@ -192,18 +217,7 @@ class CaLINEdarDateInput {
   // caLINEdar events
 
   _onClickOutside = e => {
-    // Currently we don't handle key inputs.
-    // In case the value is changed by key inputs.
-    // Before closing, let's set the date again
-    // to make sure the date correct.
-    // TODO: It is good to support key inputs.
-    // However for the schedule and scope,
-    // we cannot make everything done in the 1st version.
-    // Mark a TODO here to remind us this for the next version.
-    if (!this.setDate(this._unixDate)) {
-      this.clearDate();
-    }
-    this.caLINEdar.closeCalendar();
+    this.closeCalendar();
   }
 
   _onClearBtnClick = e => {

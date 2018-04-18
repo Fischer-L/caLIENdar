@@ -382,7 +382,7 @@ const caLINEdar = {
     return this._win.matchMedia(media).matches;
   },
 
-  /** Public APIs end **/
+  /** Public APIs End **/
 
   ID_DATE_PICKER: "caLINEdar-date-picker",
   ID_MONTH_PICKER: "caLINEdar-month-picker",
