@@ -2,17 +2,52 @@ import CaLINEdarCalender from "./caLINEdarCalender";
 import CaLINEdarDateInput from "./caLINEdarDateInput";
 import { getStandardCalenderClass, createStandardCalender } from "./StandardCalender";
 
+/**
+ * This is our main API object for the caLINEdar date picker lib.
+ * It helps to create the date input field and provide some helper methods.
+ *
+ * The whole API artchitecture goes as below
+ *
+ *          ----------
+ *         |  Users   |
+ *          ----------
+ * Control    |    ^  Notify
+ * with APIs  |    |  with events
+ *            |    |
+ *            V    |        Get dates from 
+ *    --------------------  with APIs     --------------------
+ *   | CaLINEdarDateInput | -----------> |  CaLINEdarCalender |
+ *    --------------------                --------------------
+ * Control    |    ^  Notify                    | Borrow helper methods
+ * with APIs  |    |  with events               | from 
+ *            |    |                            |
+ *            V    |                            |
+ *         -----------                          |
+ *        | caLINEdar | <------------------------
+ *         -----------    
+ */
 const caLINEdar = {
   /** Public APIs **/
 
+  /**
+   * See `CaLINEdarCalender`
+   */
   CaLINEdarCalender,
+
+  /**
+   * See `CaLINEdarDateInput`
+   */
   CaLINEdarDateInput,
 
+  /**
+   * Must call `init` before any operations
+   * 
+   * @param win {Window} The Window object
+   */
   init(win) {
     this._win = win;
     this._doc = win.document;
     this._createCalendar();
-
     win.addEventListener("click", e => this._onClick(e));
     win.addEventListener("touchend", e => this._onClick(e));
   },
@@ -27,7 +62,7 @@ const caLINEdar = {
    *    - date {*} See `CaLINEdarDateInput`.
    *    - event types {*} See `CaLINEdarDateInput`.
    *
-   * @return {CaLINEdarDateInput} An instance of `CaLINEdarDateInput`
+   * @return {CaLINEdarDateInput} An instance of `CaLINEdarDateInput`. `null` if failed.
    */
   createDateInput(params) {
     let {
@@ -35,7 +70,8 @@ const caLINEdar = {
     } = params;
 
     if (!mountElem || !mountElem.appendChild) {
-      throw new Error(`Must provide a mounting element to mount the date input`);
+      console.error(new Error("Must provide a mounting element to mount the date input"));
+      return null;
     }
 
     let inputModule = this._createInputModule();
@@ -79,48 +115,8 @@ const caLINEdar = {
   },
 
   /**
-   * @return {Date} A JS Date object meaning right now in the local time
+   * @return {bool} `true` if the calendar is open.
    */
-  getNowInLocalTimezone() {
-    // First make sure the time is always zero UTC offset. 
-    let now = (new Date()).toISOString();
-    let YYYY = parseInt(now.substr(0, 4));
-    let MM = parseInt(now.substr(5, 2)) - 1;
-    let DD = parseInt(now.substr(8, 2));
-    let hh = parseInt(now.substr(11, 2));
-    let mm = parseInt(now.substr(14, 2));
-    let ss = parseInt(now.substr(17, 2));
-    now = new Date(YYYY, MM, DD, hh, mm, ss);
-    // Recalculate `now` based on the timezone
-    return new Date(now.getTime() - now.getTimezoneOffset() * 60000);
-  },
-
-  /**
-   * @param v {*} The value to test
-   * @return {bool} `true` if the given `v` beloings to Integer or `false`
-   */
-  isInt(v) {
-    if (Number.isInteger) {
-      return Number.isInteger(v);
-    }
-    // OK We are seeing IE!?
-    if (isNaN(v)) {
-      return false;
-    }
-    let x = parseFloat(v);
-    return (x | 0) === x;
-  },
-
-  isSmallScreen() {
-    // Why not using @media in CSS?
-    // 1. We must stop `_positionCalendarOnBigScreen` in js
-    // 2. Our other js part need it as well
-    // 3. To reduce the duplicate media query rules in JS and CSS,
-    // let's test media condition and control styles by CSS selector in JS.
-    let media = "(max-width: 768px)"; // 768px is iPad
-    return this._win.matchMedia(media).matches;
-  },
-
   isCalendarOpen() {
     return this._calendar && this._calendar.hasAttribute("data-caLINEdar-opened");
   },
@@ -151,6 +147,9 @@ const caLINEdar = {
     this._calendar.style.visibility = "";
   },
 
+  /**
+   * Close the calendar
+   */
   closeCalendar() {
     if (!this._calendar) {
       console.warn("Please call `init` first then manipuate the calendar");
@@ -275,6 +274,9 @@ const caLINEdar = {
     return this._updateMonthPicker(params);
   },
 
+  /**
+   * Close the month picker
+   */
   closeMonthPicker() {
     if (this._monthPicker) {
       this._monthPicker.style.display = "none";
@@ -324,11 +326,60 @@ const caLINEdar = {
     return this._updateYearPicker(params);
   },
 
+  /**
+   * Close the year picker
+   */
   closeYearPicker() {
     if (this._yearPicker) {
       this._yearPicker.style.display = "none";
       this._yearPicker.removeAttribute("data-caLINEdar-value");
     }
+  },
+
+  /**
+   * @return {Date} A JS Date object meaning right now in the local time
+   */
+  getNowInLocalTimezone() {
+    // First make sure the time is always zero UTC offset. 
+    let now = (new Date()).toISOString();
+    let YYYY = parseInt(now.substr(0, 4));
+    let MM = parseInt(now.substr(5, 2)) - 1;
+    let DD = parseInt(now.substr(8, 2));
+    let hh = parseInt(now.substr(11, 2));
+    let mm = parseInt(now.substr(14, 2));
+    let ss = parseInt(now.substr(17, 2));
+    now = new Date(YYYY, MM, DD, hh, mm, ss);
+    // Recalculate `now` based on the timezone
+    return new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+  },
+
+  /**
+   * @param v {*} The value to test
+   * @return {bool} `true` if the given `v` beloings to Integer or `false`
+   */
+  isInt(v) {
+    if (Number.isInteger) {
+      return Number.isInteger(v);
+    }
+    // OK We are seeing IE!?
+    if (isNaN(v)) {
+      return false;
+    }
+    let x = parseFloat(v);
+    return (x | 0) === x;
+  },
+
+  /**
+   * @return {bool} `true` if the current is a small window's screen.
+   */
+  isSmallScreen() {
+    // Why not using @media in CSS?
+    // 1. We must stop `_positionCalendarOnBigScreen` in js
+    // 2. Our other js part need it as well
+    // 3. To reduce the duplicate media query rules in JS and CSS,
+    // let's test media condition and control styles by CSS selector in JS.
+    let media = "(max-width: 768px)"; // 768px is iPad
+    return this._win.matchMedia(media).matches;
   },
 
   /** Public APIs end **/
