@@ -1,3 +1,12 @@
+/**
+ * This abstract class reprensent a calendar providing dates to display.
+ * You can entend this class to create your own local canlendar.
+ * This makes our caLINEdar display not only built-in calendar but also custom calendars.
+ * Here you will hear 2 terms *js date* and *local date*. Each means:
+ * - JS date simply means a date based on JS date mechanism.
+ * - Local date simply means a date this clendar provides
+ * Say, in a Thai calendar, a local date is 2559/10/17 and its js date is 2016/10/17
+ */
 class CaLINEdarCalender {
 
   /**
