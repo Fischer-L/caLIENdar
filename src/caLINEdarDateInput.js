@@ -123,10 +123,14 @@ class CaLINEdarDateInput {
    * Open the calendar to let user pick a date
    */
   openCalendar() {
-    let datePicked = this._localDate;
-    let dateLocal = datePicked || this._calendar.getNow({ fallback: "last-date" });
-    let params = this._getDatePickerParams(dateLocal.year, dateLocal.month, datePicked);
-    this.caLINEdar.openCalendar(this.input, params);
+    if (this.caLINEdar.getCurrentDateInput() !== this) {
+      this.caLINEdar.setCurrentDateInput(this);
+      this._win.requestAnimationFrame(() => this._openCalendar());
+    } else {
+      if (!this.caLINEdar.isCalendarOpen()) {
+        this._win.requestAnimationFrame(() => this._openCalendar());
+      }
+    }
   }
 
   /**
@@ -201,15 +205,7 @@ class CaLINEdarDateInput {
       this.input.blur();
       this._win.requestAnimationFrame(() => this.input.blur());
     }
-    if (this.caLINEdar.getCurrentDateInput() !== this) {
-      this.caLINEdar.setCurrentDateInput(this);
-      // Open in the next tick. Don't block the event.
-      this._win.requestAnimationFrame(() => this.openCalendar());
-    } else {
-      if (!this.caLINEdar.isCalendarOpen()) {
-        this._win.requestAnimationFrame(() => this.openCalendar());
-      }
-    }
+    this.openCalendar();
   }
 
   // DOM events end
@@ -340,6 +336,13 @@ class CaLINEdarDateInput {
         queue.forEach(handler => handler(this));
       });
     }
+  }
+
+  _openCalendar() {
+    let datePicked = this._localDate;
+    let dateLocal = datePicked || this._calendar.getNow({ fallback: "last-date" });
+    let params = this._getDatePickerParams(dateLocal.year, dateLocal.month, datePicked);
+    this.caLINEdar.openCalendar(this.input, params);
   }
 
   _showDatePicker(year, month, datePicked) {
