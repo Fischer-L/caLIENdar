@@ -8,7 +8,6 @@ options.outputDir = production ? "dist" : "devDist";
 
 module.exports = {
   entry: {
-   index: "./src/index.js",
    "demo/demo": "./demo/demo.js"
   },
   
