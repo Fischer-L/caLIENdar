@@ -267,12 +267,7 @@ const caLINEdar = {
   /**
    * Close the month picker
    */
-  closeMonthPicker() {
-    if (this._monthPicker) {
-      this._monthPicker.style.display = "none";
-      this._monthPicker.removeAttribute("data-caLINEdar-value");
-    }
-  },
+  closeMonthPicker()
 
   /**
    * @param params {Object} The parameters are:
@@ -309,17 +304,7 @@ const caLINEdar = {
    * @param v {*} The value to test
    * @return {bool} `true` if the given `v` beloings to Integer or `false`
    */
-  isInt(v) {
-    if (Number.isInteger) {
-      return Number.isInteger(v);
-    }
-    // OK We are seeing IE!?
-    if (isNaN(v)) {
-      return false;
-    }
-    let x = parseFloat(v);
-    return (x | 0) === x;
-  }
+  isInt(v)
 
   /**
    * @return {bool} `true` if the current is a small window's screen.
@@ -374,11 +359,7 @@ class CaLINEdarDateInput {
   /**
    * Clear the date picked
    */
-  clearDate() {
-    this._unixDate =
-    this._localDate = null;
-    this.input.value = this._calendar.getDateStringPlaceholder();
-  }
+  clearDate()
 
   /**
    * Open the calendar to let user pick a date
