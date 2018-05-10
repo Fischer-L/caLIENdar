@@ -576,7 +576,7 @@ class CaLINEdarDateInput {
       prevDates = this._getDatesWithCache(prev.year, prev.month);
     }
     if (prevDates) {
-      for (let i = prevDates.length - 1; emptyCountInStart > 0;) {
+      for (let i = prevDates.length - 1; emptyCountInStart > 0, i >= 0;) {
         prevDates[i].grayOut = true;
         dates.unshift(prevDates[i]);
         --i;
@@ -598,7 +598,7 @@ class CaLINEdarDateInput {
       nextDates = this._getDatesWithCache(next.year, next.month);
     }
     if (nextDates) {
-      for (let i = 0; emptyCountInTail > 0;) {
+      for (let i = 0; emptyCountInTail > 0, i < nextDates.length;) {
         nextDates[i].grayOut = true;
         dates.push(nextDates[i]);
         ++i;
