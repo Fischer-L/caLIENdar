@@ -192,7 +192,10 @@ const IRAN_DAYS_MAP = new Map([
   ],
 ]);
 
-function createIranSolarHijriCalender(caLINEdar) {
+let _IranSolarHijriCalender = null;
+
+function getIranSolarHijriCalenderClass(caLINEdar) {
+  if (_IranSolarHijriCalender) return _IranSolarHijriCalender;
 
   class IranSolarHijriCalender extends caLINEdar.CaLINEdarCalender {
 
@@ -508,7 +511,13 @@ function createIranSolarHijriCalender(caLINEdar) {
     }
   }
 
-  return new IranSolarHijriCalender();
+  _IranSolarHijriCalender = IranSolarHijriCalender;
+  return _IranSolarHijriCalender;
+}
+
+function createIranSolarHijriCalender(caLINEdar) {
+  let Calendar = getIranSolarHijriCalenderClass(caLINEdar);
+  return new Calendar();
 }
 
 module.exports = createIranSolarHijriCalender;
