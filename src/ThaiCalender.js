@@ -125,7 +125,11 @@ const DAYS_MAP = new Map([
 
 const BUDDIHST_YEAR_OFFSET = 543;
 
-function createThaiCalender(caLINEdar) {
+let _ThaiCalender = null;
+
+function getThaiCalenderClass(caLINEdar) {
+  if (_ThaiCalender) return _ThaiCalender;
+  
   // Let's borrow from StandardCalendar
   class ThaiCalender extends caLINEdar.StandardCalendar {
     constructor() {
@@ -218,7 +222,12 @@ function createThaiCalender(caLINEdar) {
     }
   }
 
-  return new ThaiCalender();
+  _ThaiCalender = ThaiCalender;
+  return _ThaiCalender;
 }
 
+function createThaiCalender(caLINEdar) {
+  let Calendar = getThaiCalenderClass(caLINEdar);
+  return new Calendar();
+}
 module.exports = createThaiCalender;
